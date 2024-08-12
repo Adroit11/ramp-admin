@@ -46,12 +46,12 @@ export const siteSettings = {
       permission: adminAndOwnerOnly,
     },
 
-    {
-      href: Routes.settings,
-      labelTransKey: 'authorized-nav-item-settings',
-      icon: 'SettingsIcon',
-      permission: adminOnly,
-    },
+    // {
+    //   href: Routes.settings,
+    //   labelTransKey: 'authorized-nav-item-settings',
+    //   icon: 'SettingsIcon',
+    //   permission: adminOnly,
+    // },
     {
       href: Routes.logout,
       labelTransKey: 'authorized-nav-item-logout',
