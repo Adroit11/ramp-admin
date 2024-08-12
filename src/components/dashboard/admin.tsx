@@ -225,7 +225,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="col-span-full rounded-lg bg-light p-6 md:p-7">
+      {/* <div className="col-span-full rounded-lg bg-light p-6 md:p-7">
         <div className="mb-5 items-center justify-between sm:flex md:mb-7">
           <h3 className="before:content-'' relative mt-1 bg-light text-lg font-semibold text-heading before:absolute before:-top-px before:h-7 before:w-1 before:rounded-tr-md before:rounded-br-md before:bg-accent ltr:before:-left-6 rtl:before:-right-6 md:before:-top-0.5 md:ltr:before:-left-7 md:rtl:before:-right-7 lg:before:h-8">
             {t('text-order-status')}
@@ -265,7 +265,7 @@ export default function Dashboard() {
             // 'out-for-delivery',
           ]}
         />
-      </div>
+      </div> */}
 
       <RecentOrders
         className="col-span-full"
@@ -282,7 +282,7 @@ export default function Dashboard() {
           />
         }
       />
-      <div className="lg:col-span-full 2xl:col-span-8">
+      {/* <div className="lg:col-span-full 2xl:col-span-8">
         <ColumnChart
           widgetTitle={t('common:sale-history')}
           colors={['#6073D4']}
@@ -302,15 +302,15 @@ export default function Dashboard() {
             t('common:december'),
           ]}
         />
-      </div>
+      </div> */}
 
-      <PopularProductList
+      {/* <PopularProductList
         products={popularProductData}
         title={t('table:popular-products-table-title')}
         className="lg:col-span-1 lg:col-start-2 lg:row-start-5 2xl:col-span-4 2xl:col-start-auto 2xl:row-start-auto"
-      />
+      /> */}
 
-      <LowStockProduct
+      {/* <LowStockProduct
         //@ts-ignore
         products={lowStockProduct}
         title={'text-low-stock-products'}
@@ -325,26 +325,26 @@ export default function Dashboard() {
             inputClassName="!h-10"
           />
         }
-      />
+      /> */}
 
-      <TopRatedProducts
+      {/* <TopRatedProducts
         products={topRatedProducts}
         title={'text-most-rated-products'}
         className="lg:col-span-1 lg:col-start-1 lg:row-start-5 2xl:col-span-5 2xl:col-start-auto 2xl:row-start-auto 2xl:me-20"
-      />
-      <ProductCountByCategory
+      /> */}
+      {/* <ProductCountByCategory
         products={productByCategory}
         title={'text-most-category-products'}
         className="col-span-full 2xl:col-span-7 2xl:ltr:-ml-20 2xl:rtl:-mr-20"
-      />
+      /> */}
 
-      <WithdrawTable
+      {/* <WithdrawTable
         withdraws={withdraws}
         title={t('table:withdraw-table-title')}
         paginatorInfo={withdrawPaginatorInfo}
         onPagination={handlePagination}
         className="col-span-full"
-      />
+      /> */}
     </div>
   );
 }

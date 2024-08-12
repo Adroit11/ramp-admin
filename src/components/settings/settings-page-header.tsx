@@ -22,7 +22,8 @@ export default function SettingsPageHeader({
     scrollToTheLeft,
   } = useScrollableSlider();
   const menuItems: any =
-    siteSettings?.sidebarLinks?.admin.settings.childMenu[0].childMenu;
+    // @ts-ignore
+    siteSettings?.sidebarLinks?.admin?.settings?.childMenu[0].childMenu;
   const sanitizedPath = router.asPath.split('#')[0].split('?')[0];
   return (
     <>
@@ -57,7 +58,7 @@ export default function SettingsPageHeader({
                   "relative shrink-0 pb-3 font-medium text-body before:absolute before:bottom-0 before:h-px before:bg-accent before:content-[''] hover:text-heading",
                   sanitizedPath === item.href
                     ? 'text-heading before:w-full'
-                    : null
+                    : null,
                 )}
               >
                 {t(item.label)}
