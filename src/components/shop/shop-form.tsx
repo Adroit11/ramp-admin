@@ -468,7 +468,7 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
           </Card>
         </div>
 
-        <div className="flex flex-wrap pb-8 my-5 border-b border-gray-300 border-dashed sm:my-8">
+        {/* <div className="flex flex-wrap pb-8 my-5 border-b border-gray-300 border-dashed sm:my-8">
           <Description
             title={t('form:social-settings')}
             details={t('form:social-settings-helper-text')}
@@ -494,13 +494,7 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
                           defaultValue={item?.icon!}
                         />
                       </div>
-                      {/* <Input
-                        className="sm:col-span-2"
-                        label={t("form:input-label-icon")}
-                        variant="outline"
-                        {...register(`settings.socials.${index}.icon` as const)}
-                        defaultValue={item?.icon!} // make sure to set up defaultValue
-                      /> */}
+              
                       <Input
                         className="sm:col-span-2"
                         label={t('form:input-label-url')}
@@ -534,7 +528,7 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
               {t('form:button-label-add-social')}
             </Button>
           </Card>
-        </div>
+        </div> */}
 
         <StickyFooterPanel className="z-0">
           <div className="mb-5 text-end">
