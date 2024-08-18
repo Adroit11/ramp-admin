@@ -32,7 +32,7 @@ const HeaderView = ({ className, shop, ...rest }: Props) => {
         className={cn(
           'relative flex shrink-0 items-center border-b border-solid border-b-[#E7E7E7] bg-white pb-6',
           width >= RESPONSIVE_WIDTH ? '' : '',
-          className
+          className,
         )}
         {...rest}
       >
@@ -53,14 +53,14 @@ const HeaderView = ({ className, shop, ...rest }: Props) => {
           onClick={() => (adminPermission ? router.push(`/${shop?.slug}`) : '')}
         >
           <Avatar
-            src={shop?.logo?.original}
+            src={shop?.logo}
             {...rest}
             name={shop?.name as string}
             className={cn(
               'relative h-10 w-10 border-0',
-              shop?.logo?.original
+              shop?.logo
                 ? ''
-                : 'bg-muted-black text-base font-medium text-white'
+                : 'bg-muted-black text-base font-medium text-white',
             )}
           />
           {shop?.name ? (
