@@ -12,14 +12,16 @@ export const siteSettings = {
   name: 'Pixer',
   description: '',
   logo: {
-    url: '/logo.svg',
+    url: '/ramp_logo.svg',
+    // url: '/logo.svg',
     alt: 'Pixer',
     href: '/',
     width: 138,
     height: 34,
   },
   collapseLogo: {
-    url: '/collapse-logo.svg',
+    // url: '/collapse-logo.svg',
+    url: '/ramp_logo.svg',
     alt: 'P',
     href: '/',
     width: 32,

@@ -30,13 +30,14 @@ const Logo: React.FC<React.AnchorHTMLAttributes<{}>> = ({
     >
       {miniSidebar && width >= RESPONSIVE_WIDTH ? (
         <span
-          className="relative overflow-hidden "
+          className="relative overflow-hidden text-xs tracking-tighter text-center inline-flex items-end justify-center font-semibold text-accent"
           style={{
             width: siteSettings.collapseLogo.width,
             height: siteSettings.collapseLogo.height,
           }}
         >
-          <Image
+          RAMP
+          {/* <Image
             src={
               // settings?.options?.collapseLogo?.original ??
               siteSettings.collapseLogo.url
@@ -49,17 +50,18 @@ const Logo: React.FC<React.AnchorHTMLAttributes<{}>> = ({
             sizes="(max-width: 768px) 100vw"
             className="object-contain"
             loading="eager"
-          />
+          /> */}
         </span>
       ) : (
         <span
-          className="relative overflow-hidden "
+          className="relative overflow-hidden text-center inline-flex items-end justify-center font-semibold text-accent text-lg "
           style={{
             width: siteSettings.logo.width,
             height: siteSettings.logo.height,
           }}
         >
-          <Image
+          RAMP
+          {/* <Image
             src={
               // ettings?.options?.logo?.original ??
               siteSettings.logo.url
@@ -72,7 +74,7 @@ const Logo: React.FC<React.AnchorHTMLAttributes<{}>> = ({
             sizes="(max-width: 768px) 100vw"
             className="object-contain"
             loading="eager"
-          />
+          /> */}
         </span>
       )}
     </Link>
