@@ -57,76 +57,77 @@ const TopRatedProducts = dynamic(
 export default function Dashboard() {
   const { t } = useTranslation();
   const { locale } = useRouter();
-  const { data, isLoading: loading } = useAnalyticsQuery();
+  // const { data, isLoading: loading } = useAnalyticsQuery();
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTimeFrame, setActiveTimeFrame] = useState(1);
   const [orderDataRange, setOrderDataRange] = useState(
-    data?.todayTotalOrderByStatus,
+    // data?.todayTotalOrderByStatus,
+    100,
   );
 
-  const { price: total_revenue } = usePrice(
-    data && {
-      amount: data?.totalRevenue!,
-    },
-  );
-  const { price: todays_revenue } = usePrice(
-    data && {
-      amount: data?.todaysRevenue!,
-    },
-  );
-  const {
-    error: orderError,
-    orders: orderData,
-    loading: orderLoading,
-    paginatorInfo: orderPaginatorInfo,
-  } = useOrdersQuery({
-    language: locale,
-    limit: 5,
-    page,
-    tracking_number: searchTerm,
-  });
-  const {
-    data: popularProductData,
-    isLoading: popularProductLoading,
-    error: popularProductError,
-  } = usePopularProductsQuery({ limit: 10, language: locale });
+  // const { price: total_revenue } = usePrice(
+  //   data && {
+  //     amount: data?.totalRevenue!,
+  //   },
+  // );
+  // const { price: todays_revenue } = usePrice(
+  //   data && {
+  //     amount: data?.todaysRevenue!,
+  //   },
+  // );
+  // const {
+  //   error: orderError,
+  //   orders: orderData,
+  //   loading: orderLoading,
+  //   paginatorInfo: orderPaginatorInfo,
+  // } = useOrdersQuery({
+  //   language: locale,
+  //   limit: 5,
+  //   page,
+  //   tracking_number: searchTerm,
+  // });
+  // const {
+  //   data: popularProductData,
+  //   isLoading: popularProductLoading,
+  //   error: popularProductError,
+  // } = usePopularProductsQuery({ limit: 10, language: locale });
 
-  const {
-    data: topRatedProducts,
-    isLoading: topRatedProductsLoading,
-    error: topRatedProductsError,
-  } = useTopRatedProductsQuery({ limit: 10, language: locale });
+  // const {
+  //   data: topRatedProducts,
+  //   isLoading: topRatedProductsLoading,
+  //   error: topRatedProductsError,
+  // } = useTopRatedProductsQuery({ limit: 10, language: locale });
 
-  const {
-    data: lowStockProduct,
-    isLoading: lowStockProductLoading,
-    error: lowStockProductError,
-  } = useLowProductStockQuery({
-    limit: 10,
-    language: locale,
-  });
+  // const {
+  //   data: lowStockProduct,
+  //   isLoading: lowStockProductLoading,
+  //   error: lowStockProductError,
+  // } = useLowProductStockQuery({
+  //   limit: 10,
+  //   language: locale,
+  // });
 
-  const {
-    data: productByCategory,
-    isLoading: productByCategoryLoading,
-    error: productByCategoryError,
-  } = useProductByCategoryQuery({ limit: 10, language: locale });
+  // const {
+  //   data: productByCategory,
+  //   isLoading: productByCategoryLoading,
+  //   error: productByCategoryError,
+  // } = useProductByCategoryQuery({ limit: 10, language: locale });
 
-  const {
-    withdraws,
-    loading: withdrawLoading,
-    paginatorInfo: withdrawPaginatorInfo,
-  } = useWithdrawsQuery({
-    limit: 10,
-  });
+  // const {
+  //   withdraws,
+  //   loading: withdrawLoading,
+  //   paginatorInfo: withdrawPaginatorInfo,
+  // } = useWithdrawsQuery({
+  //   limit: 10,
+  // });
 
-  let salesByYear: number[] = Array.from({ length: 12 }, (_) => 0);
-  if (!!data?.totalYearSaleByMonth?.length) {
-    salesByYear = data.totalYearSaleByMonth.map((item: any) =>
-      item.total.toFixed(2),
-    );
-  }
+  // let salesByYear: number[] = Array.from({ length: 12 }, (_) => 0);
+  // if (!!data?.totalYearSaleByMonth?.length) {
+  //   salesByYear = data.totalYearSaleByMonth.map((item: any) =>
+  //     item.total.toFixed(2),
+  //   );
+  // }
 
   function handleSearch({ searchText }: { searchText: string }) {
     setSearchTerm(searchText);
@@ -144,47 +145,47 @@ export default function Dashboard() {
     { name: t('text-yearly'), day: 365 },
   ];
 
-  useEffect(() => {
-    switch (activeTimeFrame) {
-      case 1:
-        setOrderDataRange(data?.todayTotalOrderByStatus);
-        break;
-      case 7:
-        setOrderDataRange(data?.weeklyTotalOrderByStatus);
-        break;
-      case 30:
-        setOrderDataRange(data?.monthlyTotalOrderByStatus);
-        break;
-      case 365:
-        setOrderDataRange(data?.yearlyTotalOrderByStatus);
-        break;
+  // useEffect(() => {
+  //   switch (activeTimeFrame) {
+  //     case 1:
+  //       setOrderDataRange(data?.todayTotalOrderByStatus);
+  //       break;
+  //     case 7:
+  //       setOrderDataRange(data?.weeklyTotalOrderByStatus);
+  //       break;
+  //     case 30:
+  //       setOrderDataRange(data?.monthlyTotalOrderByStatus);
+  //       break;
+  //     case 365:
+  //       setOrderDataRange(data?.yearlyTotalOrderByStatus);
+  //       break;
 
-      default:
-        setOrderDataRange(orderDataRange);
-        break;
-    }
-  });
+  //     default:
+  //       setOrderDataRange(orderDataRange);
+  //       break;
+  //   }
+  // });
 
-  if (
-    loading ||
-    orderLoading ||
-    popularProductLoading ||
-    withdrawLoading ||
-    topRatedProductsLoading
-  ) {
-    return <Loader text={t('common:text-loading')} />;
-  }
-  if (orderError || popularProductError || topRatedProductsError) {
-    return (
-      <ErrorMessage
-        message={
-          orderError?.message ||
-          popularProductError?.message ||
-          topRatedProductsError?.message
-        }
-      />
-    );
-  }
+  // if (
+  //   loading ||
+  //   orderLoading ||
+  //   popularProductLoading ||
+  //   withdrawLoading ||
+  //   topRatedProductsLoading
+  // ) {
+  //   return <Loader text={t('common:text-loading')} />;
+  // }
+  // if (orderError || popularProductError || topRatedProductsError) {
+  //   return (
+  //     <ErrorMessage
+  //       message={
+  //         orderError?.message ||
+  //         popularProductError?.message ||
+  //         topRatedProductsError?.message
+  //       }
+  //     />
+  //   );
+  // }
 
   return (
     <div className="grid gap-7 md:gap-8 lg:grid-cols-2 2xl:grid-cols-12">
@@ -201,26 +202,26 @@ export default function Dashboard() {
             subtitleTransKey="sticker-card-subtitle-rev"
             icon={<EaringIcon className="h-8 w-8" />}
             color="#1EAE98"
-            price={total_revenue}
+            price={0}
           />
           <StickerCard
             titleTransKey="sticker-card-title-order"
             subtitleTransKey="sticker-card-subtitle-order"
             icon={<ShoppingIcon className="h-8 w-8" />}
             color="#865DFF"
-            price={data?.totalOrders}
+            price={0}
           />
           <StickerCard
             titleTransKey="sticker-card-title-vendor"
             icon={<ChecklistIcon className="h-8 w-8" />}
             color="#D74EFF"
-            price={data?.totalVendors}
+            price={0}
           />
           <StickerCard
             titleTransKey="sticker-card-title-total-shops"
             icon={<BasketIcon className="h-8 w-8" />}
             color="#E157A0"
-            price={data?.totalShops}
+            price={0}
           />
         </div>
       </div>
@@ -269,8 +270,8 @@ export default function Dashboard() {
 
       <RecentOrders
         className="col-span-full"
-        orders={orderData}
-        paginatorInfo={orderPaginatorInfo}
+        orders={[]}
+        paginatorInfo={null}
         title={t('table:recent-order-table-title')}
         onPagination={handlePagination}
         searchElement={

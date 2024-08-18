@@ -20,6 +20,7 @@ const getPreviewImage = (value: any) => {
   }
   return images;
 };
+
 export default function Uploader({
   onChange,
   value,
@@ -29,10 +30,12 @@ export default function Uploader({
   maxSize,
   maxFiles,
   disabled,
+  defaultImage,
 }: any) {
   const { t } = useTranslation();
-  const [files, setFiles] = useState<Attachment[]>(getPreviewImage(value));
-  const { mutate: upload, isLoading: loading } = useUploadMutation();
+  // const [files, setFiles] = useState<Attachment[]>(getPreviewImage(value));
+  const [previews, setPreviews] = useState<(File & { preview: string })[]>([]);
+  // const { mutate: upload, isLoading: loading } = useUploadMutation();
   const [error, setError] = useState<string | null>(null);
   const { getRootProps, getInputProps } = useDropzone({
     ...(!acceptFile
@@ -45,35 +48,44 @@ export default function Uploader({
     multiple,
     onDrop: async (acceptedFiles) => {
       if (acceptedFiles.length) {
-        upload(
-          acceptedFiles, // it will be an array of uploaded attachments
-          {
-            onSuccess: (data: any) => {
-              // Process Digital File Name section
-              data &&
-                data?.map((file: any, idx: any) => {
-                  const splitArray = file?.original?.split('/');
-                  let fileSplitName =
-                    splitArray[splitArray?.length - 1]?.split('.');
-                  const fileType = fileSplitName?.pop(); // it will pop the last item from the fileSplitName arr which is the file ext
-                  const filename = fileSplitName?.join('.'); // it will join the array with dot, which restore the original filename
-                  data[idx]['file_name'] = filename + '.' + fileType;
-                });
-
-              let mergedData;
-              if (multiple) {
-                mergedData = files.concat(data);
-                setFiles(files.concat(data));
-              } else {
-                mergedData = data[0];
-                setFiles(data);
-              }
-              if (onChange) {
-                onChange(mergedData);
-              }
-            },
-          },
+        onChange(acceptedFiles[0]);
+        setPreviews(
+          acceptedFiles.map((file) =>
+            Object.assign(file, {
+              preview: URL.createObjectURL(file),
+            }),
+          ),
         );
+
+        // upload(
+        //   acceptedFiles, // it will be an array of uploaded attachments
+        //   {
+        //     onSuccess: (data: any) => {
+        //       // Process Digital File Name section
+        //       data &&
+        //         data?.map((file: any, idx: any) => {
+        //           const splitArray = file?.original?.split('/');
+        //           let fileSplitName =
+        //             splitArray[splitArray?.length - 1]?.split('.');
+        //           const fileType = fileSplitName?.pop(); // it will pop the last item from the fileSplitName arr which is the file ext
+        //           const filename = fileSplitName?.join('.'); // it will join the array with dot, which restore the original filename
+        //           data[idx]['file_name'] = filename + '.' + fileType;
+        //         });
+
+        //       let mergedData;
+        //       if (multiple) {
+        //         mergedData = files.concat(data);
+        //         setFiles(files.concat(data));
+        //       } else {
+        //         mergedData = data[0];
+        //         setFiles(data);
+        //       }
+        //       if (onChange) {
+        //         onChange(mergedData);
+        //       }
+        //     },
+        //   },
+        // );
       }
     },
     // maxFiles: 2,
@@ -92,120 +104,172 @@ export default function Uploader({
   });
 
   const handleDelete = (image: string) => {
-    const images = files.filter((file) => file.thumbnail !== image);
-    setFiles(images);
+    const images = previews.filter((file) => file.name !== image);
+    setPreviews(images);
     if (onChange) {
-      onChange(images);
+      onChange(images[0] ?? images);
     }
   };
-  const thumbs = files?.map((file: any, idx) => {
-    const imgTypes = [
-      'tif',
-      'tiff',
-      'bmp',
-      'jpg',
-      'jpeg',
-      'webp',
-      'gif',
-      'png',
-      'eps',
-      'raw',
-    ];
-    // let filename, fileType, isImage;
-    if (file && file.id) {
-      // const processedFile = processFileWithName(file);
-      const splitArray = file?.file_name
-        ? file?.file_name.split('.')
-        : file?.thumbnail?.split('.');
-      const fileType = splitArray?.pop(); // it will pop the last item from the fileSplitName arr which is the file ext
-      const filename = splitArray?.join('.'); // it will join the array with dot, which restore the original filename
-      const isImage = file?.thumbnail && imgTypes.includes(fileType); // check if the original filename has the img ext
 
-      // Old Code *******
+  // const thumbs = files?.map((file: any, idx) => {
+  //   const imgTypes = [
+  //     'tif',
+  //     'tiff',
+  //     'bmp',
+  //     'jpg',
+  //     'jpeg',
+  //     'webp',
+  //     'gif',
+  //     'png',
+  //     'eps',
+  //     'raw',
+  //   ];
+  //   // let filename, fileType, isImage;
+  //   if (file && file.id) {
+  //     // const processedFile = processFileWithName(file);
+  //     const splitArray = file?.file_name
+  //       ? file?.file_name.split('.')
+  //       : file?.thumbnail?.split('.');
+  //     const fileType = splitArray?.pop(); // it will pop the last item from the fileSplitName arr which is the file ext
+  //     const filename = splitArray?.join('.'); // it will join the array with dot, which restore the original filename
+  //     const isImage = file?.thumbnail && imgTypes.includes(fileType); // check if the original filename has the img ext
 
-      // const splitArray = file?.original?.split('/');
-      // let fileSplitName = splitArray[splitArray?.length - 1]?.split('.'); // it will create an array of words of filename
-      // const fileType = fileSplitName.pop(); // it will pop the last item from the fileSplitName arr which is the file ext
-      // const filename = fileSplitName.join('.'); // it will join the array with dot, which restore the original filename
-      // const isImage = file?.thumbnail && imgTypes.includes(fileType); // check if the original filename has the img ext
+  //     // Old Code *******
 
-      return (
+  //     // const splitArray = file?.original?.split('/');
+  //     // let fileSplitName = splitArray[splitArray?.length - 1]?.split('.'); // it will create an array of words of filename
+  //     // const fileType = fileSplitName.pop(); // it will pop the last item from the fileSplitName arr which is the file ext
+  //     // const filename = fileSplitName.join('.'); // it will join the array with dot, which restore the original filename
+  //     // const isImage = file?.thumbnail && imgTypes.includes(fileType); // check if the original filename has the img ext
+
+  //     return (
+  //       <div
+  //         className={cn(
+  //           'relative mt-2 inline-flex flex-col overflow-hidden rounded me-2',
+  //           isImage ? 'border border-border-200' : '',
+  //           disabled ? 'cursor-not-allowed border-[#D4D8DD] bg-[#EEF1F4]' : '',
+  //         )}
+  //         key={idx}
+  //       >
+  //         {/* {file?.thumbnail && isImage ? ( */}
+  //         {isImage ? (
+  //           // <div className="flex items-center justify-center w-16 h-16 min-w-0 overflow-hidden">
+  //           //   <Image
+  //           //     src={file.thumbnail}
+  //           //     width={56}
+  //           //     height={56}
+  //           //     alt="uploaded image"
+  //           //   />
+  //           // </div>
+  //           <figure className="relative h-16 w-28">
+  //             <Image
+  //               src={file.thumbnail}
+  //               alt={filename}
+  //               fill
+  //               sizes="(max-width: 768px) 100vw"
+  //               className="object-contain"
+  //             />
+  //           </figure>
+  //         ) : (
+  //           <div className="flex flex-col items-center">
+  //             <div className="flex h-14 w-14 min-w-0 items-center justify-center overflow-hidden">
+  //               <Image
+  //                 src={zipPlaceholder}
+  //                 width={56}
+  //                 height={56}
+  //                 alt="upload placeholder"
+  //               />
+  //             </div>
+  //             <p className="flex cursor-default items-baseline p-1 text-xs text-body">
+  //               <span
+  //                 className="inline-block max-w-[64px] overflow-hidden overflow-ellipsis whitespace-nowrap"
+  //                 title={`${filename}.${fileType}`}
+  //               >
+  //                 {filename}
+  //               </span>
+  //               .{fileType}
+  //             </p>
+  //           </div>
+  //         )}
+
+  //         {/* // TODO : this uploader component needs to be checked in pixer */}
+
+  //         {multiple ? (
+  //           <button
+  //             className="absolute top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-xs text-light shadow-xl outline-none end-1"
+  //             onClick={() => handleDelete(file.thumbnail)}
+  //           >
+  //             <CloseIcon width={10} height={10} />
+  //           </button>
+  //         ) : null}
+
+  //         {/* {multiple ? (
+  //         ) : null} */}
+  //         {!disabled ? (
+  //           <button
+  //             className="absolute top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-xs text-light shadow-xl outline-none end-1"
+  //             onClick={() => handleDelete(file.thumbnail)}
+  //           >
+  //             <CloseIcon width={10} height={10} />
+  //           </button>
+  //         ) : (
+  //           ''
+  //         )}
+  //       </div>
+  //     );
+  //   }
+  // });
+
+  const thumbs =
+    defaultImage && !previews.length ? (
+      <div
+        className={cn(
+          'relative mt-2 inline-flex flex-col overflow-hidden rounded me-2',
+          'border border-border-200',
+          disabled ? 'cursor-not-allowed border-[#D4D8DD] bg-[#EEF1F4]' : '',
+        )}
+      >
+        <figure className="relative h-16 w-28">
+          <Image
+            src={defaultImage}
+            alt={''}
+            fill
+            sizes="(max-width: 768px) 100vw"
+            className="object-contain"
+          />
+        </figure>
+      </div>
+    ) : (
+      previews?.map((file, idx) => (
         <div
           className={cn(
             'relative mt-2 inline-flex flex-col overflow-hidden rounded me-2',
-            isImage ? 'border border-border-200' : '',
+            'border border-border-200',
             disabled ? 'cursor-not-allowed border-[#D4D8DD] bg-[#EEF1F4]' : '',
           )}
           key={idx}
         >
-          {/* {file?.thumbnail && isImage ? ( */}
-          {isImage ? (
-            // <div className="flex items-center justify-center w-16 h-16 min-w-0 overflow-hidden">
-            //   <Image
-            //     src={file.thumbnail}
-            //     width={56}
-            //     height={56}
-            //     alt="uploaded image"
-            //   />
-            // </div>
-            <figure className="relative h-16 w-28">
-              <Image
-                src={file.thumbnail}
-                alt={filename}
-                fill
-                sizes="(max-width: 768px) 100vw"
-                className="object-contain"
-              />
-            </figure>
-          ) : (
-            <div className="flex flex-col items-center">
-              <div className="flex h-14 w-14 min-w-0 items-center justify-center overflow-hidden">
-                <Image
-                  src={zipPlaceholder}
-                  width={56}
-                  height={56}
-                  alt="upload placeholder"
-                />
-              </div>
-              <p className="flex cursor-default items-baseline p-1 text-xs text-body">
-                <span
-                  className="inline-block max-w-[64px] overflow-hidden overflow-ellipsis whitespace-nowrap"
-                  title={`${filename}.${fileType}`}
-                >
-                  {filename}
-                </span>
-                .{fileType}
-              </p>
-            </div>
-          )}
+          <figure className="relative h-16 w-28">
+            <Image
+              src={file.preview}
+              alt={file.name}
+              fill
+              sizes="(max-width: 768px) 100vw"
+              className="object-contain"
+            />
+          </figure>
 
-          {/* // TODO : this uploader component needs to be checked in pixer */}
-
-          {multiple ? (
+          {!disabled ? (
             <button
               className="absolute top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-xs text-light shadow-xl outline-none end-1"
-              onClick={() => handleDelete(file.thumbnail)}
+              onClick={() => handleDelete(file.name)}
             >
               <CloseIcon width={10} height={10} />
             </button>
           ) : null}
-
-          {/* {multiple ? (
-          ) : null} */}
-          {!disabled ? (
-            <button
-              className="absolute top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-xs text-light shadow-xl outline-none end-1"
-              onClick={() => handleDelete(file.thumbnail)}
-            >
-              <CloseIcon width={10} height={10} />
-            </button>
-          ) : (
-            ''
-          )}
         </div>
-      );
-    }
-  });
+      ))
+    );
 
   useEffect(
     () => () => {
@@ -213,9 +277,9 @@ export default function Uploader({
       setError(null);
 
       // Make sure to revoke the data uris to avoid memory leaks
-      files.forEach((file: any) => URL.revokeObjectURL(file.thumbnail));
+      previews.forEach((file) => URL.revokeObjectURL(file.preview));
     },
-    [files],
+    [previews],
   );
 
   return (
@@ -250,16 +314,18 @@ export default function Uploader({
         )}
       </div>
 
-      {(!!thumbs.length || loading) && (
+      {defaultImage && !previews.length ? (
+        <aside className="mt-2 flex flex-wrap">{thumbs}</aside>
+      ) : Array.isArray(thumbs) && !!thumbs.length ? (
         <aside className="mt-2 flex flex-wrap">
           {!!thumbs.length && thumbs}
-          {loading && (
+          {/* {loading && (
             <div className="mt-2 flex h-16 items-center ms-2">
               <Loader simple={true} className="h-6 w-6" />
             </div>
-          )}
+          )} */}
         </aside>
-      )}
+      ) : null}
     </section>
   );
 }

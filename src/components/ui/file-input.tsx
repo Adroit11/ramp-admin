@@ -10,6 +10,7 @@ interface FileInputProps {
   defaultValue?: any;
   maxSize?: number;
   disabled?: boolean;
+  defaultImage?: string;
 }
 
 const FileInput = ({
@@ -18,7 +19,8 @@ const FileInput = ({
   multiple = true,
   acceptFile = false,
   helperText,
-  defaultValue = [],
+  defaultValue,
+  defaultImage,
   maxSize,
   disabled,
 }: FileInputProps) => {
@@ -27,6 +29,9 @@ const FileInput = ({
       control={control}
       name={name}
       defaultValue={defaultValue}
+      // rules={{
+      //   required: { value: true, message: 'This field is required' },
+      // }}
       // @ts-ignore
       render={({ field: { ref, ...rest } }) => (
         <Uploader
@@ -36,6 +41,7 @@ const FileInput = ({
           helperText={helperText}
           maxSize={maxSize}
           disabled={disabled}
+          defaultImage={defaultImage}
         />
       )}
     />

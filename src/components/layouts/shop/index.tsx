@@ -1,7 +1,11 @@
 import Navbar from '@/components/layouts/navigation/top-navbar';
 import { miniSidebarInitialValue } from '@/utils/constants';
 import { useRouter } from 'next/router';
-import { getAuthCredentials, hasAccess } from '@/utils/auth-utils';
+import {
+  getAuthCredentials,
+  getUserAuthData,
+  hasAccess,
+} from '@/utils/auth-utils';
 import SidebarItem from '@/components/layouts/navigation/sidebar-item';
 import { siteSettings } from '@/settings/site.settings';
 import { useTranslation } from 'next-i18next';
@@ -37,27 +41,28 @@ interface MenuItemsProps {
 const SidebarItemMap = ({ menuItems }: any) => {
   const { locale } = useRouter();
   const { t } = useTranslation();
-  const { settings } = useSettingsQuery({
-    language: locale!,
-  });
+  // const { settings } = useSettingsQuery({
+  //   language: locale!,
+  // });
   const { childMenu } = menuItems;
   // @ts-ignore
-  const isEnableTermsRoute = settings?.options?.enableTerms;
-  const { permissions: currentUserPermissions } = getAuthCredentials();
+  // const isEnableTermsRoute = settings?.options?.enableTerms;
+  const userAuthData = getUserAuthData();
+  // const { permissions: currentUserPermissions } = getAuthCredentials();
   const [miniSidebar, _] = useAtom(miniSidebarInitialValue);
   const { width } = useWindowSize();
   const {
     query: { shop },
   } = useRouter();
 
-  let termsAndConditions;
+  // let termsAndConditions;
 
-  if (!Boolean(isEnableTermsRoute)) {
-    termsAndConditions = menuItems?.childMenu.find(
-      (item: any) => item?.label === 'Terms And Conditions',
-    );
-    if (termsAndConditions) termsAndConditions.permissions = adminOnly;
-  }
+  // if (!Boolean(isEnableTermsRoute)) {
+  //   termsAndConditions = menuItems?.childMenu.find(
+  //     (item: any) => item?.label === 'Terms And Conditions',
+  //   );
+  //   if (termsAndConditions) termsAndConditions.permissions = adminOnly;
+  // }
 
   return (
     <div className="space-y-2">
@@ -75,9 +80,9 @@ const SidebarItemMap = ({ menuItems }: any) => {
           childMenu: any;
           permissions: any;
         }) => {
-          if (!childMenu && !hasAccess(permissions, currentUserPermissions)) {
-            return null;
-          }
+          // if (!childMenu) {
+          //   return null;
+          // }
 
           return (
             <SidebarItem
@@ -90,7 +95,7 @@ const SidebarItemMap = ({ menuItems }: any) => {
               miniSidebar={miniSidebar && width >= RESPONSIVE_WIDTH}
             />
           );
-        }
+        },
       )}
     </div>
   );
@@ -98,15 +103,18 @@ const SidebarItemMap = ({ menuItems }: any) => {
 
 const SideBarGroup = () => {
   const [miniSidebar, _] = useAtom(miniSidebarInitialValue);
-  const { role } = getAuthCredentials();
-  const menuItems: MenuItemsProps =
-    role === 'staff'
-      ? siteSettings?.sidebarLinks?.staff
-      : siteSettings?.sidebarLinks?.shop;
+  // const { role } = getAuthCredentials();
+  const userAuthData = getUserAuthData();
+  const menuItems: MenuItemsProps = siteSettings?.sidebarLinks?.shop;
+  // const menuItems: MenuItemsProps =
+  //   role === 'staff'
+  //     ? siteSettings?.sidebarLinks?.staff
+  //     : siteSettings?.sidebarLinks?.shop;
   const menuKeys = Object.keys(menuItems);
   const { width } = useWindowSize();
   const { t } = useTranslation();
 
+  // console.log('kkkkkk', menuItems.root);
   return (
     <>
       {menuKeys?.map((menu, index) => (
@@ -115,14 +123,14 @@ const SideBarGroup = () => {
             'flex flex-col px-5',
             miniSidebar && width >= RESPONSIVE_WIDTH
               ? 'border-b border-dashed border-gray-200 py-5'
-              : 'pt-6 pb-3'
+              : 'pt-6 pb-3',
           )}
           key={index}
         >
           <div
             className={cn(
               'px-3 pb-5 text-xs font-semibold uppercase tracking-[0.05em] text-body/60',
-              miniSidebar && width >= RESPONSIVE_WIDTH ? 'hidden' : ''
+              miniSidebar && width >= RESPONSIVE_WIDTH ? 'hidden' : '',
             )}
           >
             {t(menuItems[menu]?.label)}
@@ -160,7 +168,7 @@ const ShopLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
               (underMaintenance || underMaintenanceStart)
               ? 'pt-[8.75rem]'
               : 'pt-20',
-            miniSidebar && width >= RESPONSIVE_WIDTH ? 'lg:w-24' : 'lg:w-76'
+            miniSidebar && width >= RESPONSIVE_WIDTH ? 'lg:w-24' : 'lg:w-76',
           )}
         >
           <div className="sidebar-scrollbar h-full w-full overflow-x-hidden">
@@ -185,7 +193,7 @@ const ShopLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
               : 'pt-[3.9375rem] lg:pt-[4.75rem]',
             miniSidebar && width >= RESPONSIVE_WIDTH
               ? 'ltr:pl-24 rtl:pr-24'
-              : 'ltr:xl:pl-76 rtl:xl:pr-76 ltr:lg:pl-72 rtl:lg:pr-72 rtl:lg:pl-0'
+              : 'ltr:xl:pl-76 rtl:xl:pr-76 ltr:lg:pl-72 rtl:lg:pr-72 rtl:lg:pl-0',
           )}
         >
           <div className="h-full p-5 md:p-8">{children}</div>

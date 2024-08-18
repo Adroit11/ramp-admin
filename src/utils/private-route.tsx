@@ -1,6 +1,6 @@
 import React from 'react';
 import { useRouter } from 'next/router';
-import { getAuthCredentials, hasAccess } from './auth-utils';
+import { getAuthCredentials, getUserAuthData, hasAccess } from './auth-utils';
 import Loader from '@/components/ui/loader/loader';
 import AccessDeniedPage from '@/components/common/access-denied';
 import { Routes } from '@/config/routes';
@@ -10,14 +10,19 @@ const PrivateRoute: React.FC<{
   children?: React.ReactNode;
 }> = ({ children, authProps }) => {
   const router = useRouter();
-  const { token, permissions } = getAuthCredentials();
-  const isUser = !!token;
-  const hasPermission =
-    Array.isArray(permissions) &&
-    !!permissions.length &&
-    hasAccess(authProps.permissions, permissions);
+  // const { token, permissions } = getAuthCredentials();
+  const userAuthData = getUserAuthData();
+  // const isUser = !!token;
+  const isUser = !!userAuthData?.token;
+  // const hasPermission =
+  //   Array.isArray(permissions) &&
+  //   !!permissions.length &&
+  //   hasAccess(authProps.permissions, permissions);
+  const hasPermission = !!userAuthData?.permissions;
+
   React.useEffect(() => {
-    if (!isUser) router.replace(Routes.login); // If not authenticated, force log in
+    if (!isUser) router.replace(Routes.login);
+    // If not authenticated, force log in
   }, [isUser]);
 
   if (isUser && hasPermission) {

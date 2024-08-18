@@ -24,36 +24,38 @@ export const useMeQuery = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
 
-  return useQuery<User, Error>([API_ENDPOINTS.ME], userClient.me, {
-    retry: false,
+  // return useQuery<User, Error>([API_ENDPOINTS.ME], userClient.me, {
+  //   retry: false,
 
-    onSuccess: () => {
-      if (router.pathname === Routes.verifyLicense) {
-        router.replace(Routes.dashboard);
-      }
-      if (router.pathname === Routes.verifyEmail) {
-        setEmailVerified(true);
-        router.replace(Routes.dashboard);
-      }
-    },
+  //   onSuccess: () => {
+  //     if (router.pathname === Routes.verifyLicense) {
+  //       router.replace(Routes.dashboard);
+  //     }
+  //     if (router.pathname === Routes.verifyEmail) {
+  //       setEmailVerified(true);
+  //       router.replace(Routes.dashboard);
+  //     }
+  //   },
 
-    onError: (err) => {
-      if (axios.isAxiosError(err)) {
-        if (err.response?.status === 417) {
-          router.replace(Routes.verifyLicense);
-          return;
-        }
+  //   onError: (err) => {
+  //     if (axios.isAxiosError(err)) {
+  //       if (err.response?.status === 417) {
+  //         router.replace(Routes.verifyLicense);
+  //         return;
+  //       }
 
-        if (err.response?.status === 409) {
-          setEmailVerified(false);
-          router.replace(Routes.verifyEmail);
-          return;
-        }
-        queryClient.clear();
-        router.replace(Routes.login);
-      }
-    },
-  });
+  //       if (err.response?.status === 409) {
+  //         setEmailVerified(false);
+  //         router.replace(Routes.verifyEmail);
+  //         return;
+  //       }
+  //       queryClient.clear();
+  //       // router.replace(Routes.login);
+  //     }
+  //   },
+  // });
+
+  return {};
 };
 
 export function useLogin() {
@@ -67,7 +69,7 @@ export const useLogoutMutation = () => {
   return useMutation(userClient.logout, {
     onSuccess: () => {
       Cookies.remove(AUTH_CRED);
-      router.replace(Routes.login);
+      // router.replace(Routes.login);
       toast.success(t('common:successfully-logout'), {
         toastId: 'logoutSuccess',
       });
@@ -132,7 +134,6 @@ export const useChangePasswordMutation = () => {
   return useMutation(userClient.changePassword);
 };
 
-
 export const useForgetPasswordMutation = () => {
   return useMutation(userClient.forgetPassword);
 };
@@ -172,8 +173,6 @@ export const useVerifyForgetPasswordTokenMutation = () => {
 export const useResetPasswordMutation = () => {
   return useMutation(userClient.resetPassword);
 };
-
-
 
 export const useMakeOrRevokeAdminMutation = () => {
   const queryClient = useQueryClient();
@@ -248,7 +247,7 @@ export const useUserQuery = ({ id }: { id: string }) => {
     () => userClient.fetchUser({ id }),
     {
       enabled: Boolean(id),
-    }
+    },
   );
 };
 
@@ -258,7 +257,7 @@ export const useUsersQuery = (params: Partial<QueryOptionsType>) => {
     () => userClient.fetchUsers(params),
     {
       keepPreviousData: true,
-    }
+    },
   );
 
   return {
@@ -275,7 +274,7 @@ export const useAdminsQuery = (params: Partial<QueryOptionsType>) => {
     () => userClient.fetchAdmins(params),
     {
       keepPreviousData: true,
-    }
+    },
   );
 
   return {
@@ -292,7 +291,7 @@ export const useVendorsQuery = (params: Partial<UserQueryOptions>) => {
     () => userClient.fetchVendors(params),
     {
       keepPreviousData: true,
-    }
+    },
   );
 
   return {
@@ -309,7 +308,7 @@ export const useCustomersQuery = (params: Partial<UserQueryOptions>) => {
     () => userClient.fetchCustomers(params),
     {
       keepPreviousData: true,
-    }
+    },
   );
 
   return {
@@ -320,14 +319,15 @@ export const useCustomersQuery = (params: Partial<UserQueryOptions>) => {
   };
 };
 
-
-export const useMyStaffsQuery = (params: Partial<UserQueryOptions & { shop_id: string }>) => {
+export const useMyStaffsQuery = (
+  params: Partial<UserQueryOptions & { shop_id: string }>,
+) => {
   const { data, isLoading, error } = useQuery<UserPaginator, Error>(
     [API_ENDPOINTS.MY_STAFFS, params],
     () => userClient.getMyStaffs(params),
     {
       keepPreviousData: true,
-    }
+    },
   );
 
   return {
@@ -338,14 +338,13 @@ export const useMyStaffsQuery = (params: Partial<UserQueryOptions & { shop_id: s
   };
 };
 
-
 export const useAllStaffsQuery = (params: Partial<UserQueryOptions>) => {
   const { data, isLoading, error } = useQuery<UserPaginator, Error>(
     [API_ENDPOINTS.ALL_STAFFS, params],
     () => userClient.getAllStaffs(params),
     {
       keepPreviousData: true,
-    }
+    },
   );
 
   return {
@@ -355,4 +354,3 @@ export const useAllStaffsQuery = (params: Partial<UserQueryOptions>) => {
     error,
   };
 };
-

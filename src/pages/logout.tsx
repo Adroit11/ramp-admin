@@ -3,13 +3,18 @@ import Loader from '@/components/ui/loader/loader';
 import { useLogoutMutation } from '@/data/user';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { clearStorage } from '@/utils/auth-utils';
+import { useRouter } from 'next/router';
+import { Routes } from '@/config/routes';
 
 function SignOut() {
   const { t } = useTranslation();
-  const { mutate: logout } = useLogoutMutation();
+  const router = useRouter();
+  // const { mutate: logout } = useLogoutMutation();
 
   useEffect(() => {
-    logout();
+    clearStorage();
+    router.push(Routes.login);
   }, []);
 
   return <Loader text={t('common:signing-out-text')} />;

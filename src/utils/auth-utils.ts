@@ -9,6 +9,7 @@ import {
   SUPER_ADMIN,
   TOKEN,
 } from './constants';
+import { UserAuthType } from '@/types/auth';
 
 export const allowedRoles = [SUPER_ADMIN, STORE_OWNER, STAFF];
 export const adminAndOwnerOnly = [SUPER_ADMIN, STORE_OWNER];
@@ -53,11 +54,11 @@ export function parseSSRCookie(context: any) {
 
 export function hasAccess(
   _allowedRoles: string[],
-  _userPermissions: string[] | undefined | null
+  _userPermissions: string[] | undefined | null,
 ) {
   if (_userPermissions) {
     return Boolean(
-      _allowedRoles?.find((aRole) => _userPermissions.includes(aRole))
+      _allowedRoles?.find((aRole) => _userPermissions.includes(aRole)),
     );
   }
   return false;
@@ -69,3 +70,55 @@ export function isAuthenticated(_cookies: any) {
     !!_cookies[PERMISSIONS].length
   );
 }
+
+// RAMP AUTH
+const USER_AUTH_DATA = 'ramp_user';
+
+export function setUserAuthData(data: UserAuthType) {
+  Cookie.set(USER_AUTH_DATA, JSON.stringify(data));
+}
+
+export function getUserAuthData(context?: any) {
+  let authCred;
+  if (context) {
+    authCred = parseSSRCookie(context)[USER_AUTH_DATA];
+  } else {
+    authCred = Cookie.get(USER_AUTH_DATA);
+  }
+
+  if (!authCred) {
+    return null;
+  } else {
+    if (authCred) {
+      return JSON.parse(authCred) as UserAuthType;
+    }
+  }
+}
+
+export function isUserAuthenticated() {
+  const user = getUserAuthData();
+
+  if (!user) return false;
+  return user.token && user.permissions;
+}
+
+export function isStoreOwner() {
+  const user = getUserAuthData();
+
+  if (!user) {
+    clearStorage();
+    if (typeof window !== 'undefined') {
+      window.location.reload();
+    }
+  }
+
+  return user?.role === 'store_owner';
+}
+
+export const clearStorage = () => {
+  if (typeof window !== 'undefined') {
+    Cookie.remove(USER_AUTH_DATA);
+    localStorage.clear();
+    sessionStorage.clear();
+  }
+};

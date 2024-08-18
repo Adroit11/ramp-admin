@@ -41,12 +41,12 @@ const ShopCard: React.FC<ShopCardProps> = ({ shop }) => {
 
   return (
     <Link
-      href={`/${shop?.slug}`}
-      className="overflow-hidden rounded-lg bg-white"
+      href={`/${shop?.uid}`}
+      className="overflow-hidden rounded-lg bg-white border-2 hover:border-accent transition duration-300"
     >
       <div
         className={classNames(
-          'relative flex h-22 justify-end overflow-hidden'
+          'relative flex h-22 justify-end overflow-hidden',
           // shop?.cover_image?.original ? '' : 'flex justify-end'
         )}
       >
@@ -70,7 +70,8 @@ const ShopCard: React.FC<ShopCardProps> = ({ shop }) => {
         <ShopAvatar
           is_active={shop?.is_active}
           name={shop?.name}
-          logo={shop?.logo}
+          // @ts-ignore
+          logo={shop?.logo ?? ''}
         />
         <div className="relative max-w-[calc(100%-104px)] flex-auto pr-4 pt-2">
           {shop?.name ? (
@@ -90,40 +91,42 @@ const ShopCard: React.FC<ShopCardProps> = ({ shop }) => {
             </p>
           </div>
 
-          <div className="mt-2 flex w-11/12 items-center gap-1 text-xs leading-none">
+          {/* <div className="mt-2 flex w-11/12 items-center gap-1 text-xs leading-none">
             <PhoneOutlineIcon className="shrink-0 text-[#666666]" />
             <p className="truncate text-xs text-base-dark">
               {phoneNumber ?? '???'}
             </p>
-          </div>
+          </div> */}
         </div>
       </div>
 
-      <ul className="mt-4 grid grid-cols-4 divide-x divide-[#E7E7E7] px-2 pb-7 text-center">
+      <ul className="mt-4 grid grid-cols-2 divide-x divide-[#E7E7E7] px-2 pb-7 text-center">
         <li>
           <ListItem
-            title={t('text-title-commission')}
+            // title={t('text-title-commission')}
+            title={t('Products')}
             info={shop?.balance?.admin_commission_rate ?? (0 as number)}
           />
         </li>
         <li>
           <ListItem
-            title={t('text-title-sale')}
-            info={shop?.balance?.total_earnings as number}
+            // title={t('text-title-sale')}
+            title={t('Orders')}
+            info={shop?.balance?.total_earnings ?? (0 as number)}
           />
         </li>
-        <li>
+        {/* <li>
           <ListItem
             title={t('text-title-balance')}
-            info={shop?.balance?.current_balance as number}
+            info={shop?.balance?.current_balance ?? (0 as number)}
           />
         </li>
         <li>
           <ListItem
             title={t('text-title-withdraw')}
-            info={shop?.balance?.withdrawn_amount as number}
+            info={shop?.balance?.withdrawn_amount ?? (0 as number)}
           />
-        </li>
+        </li> */}
       </ul>
     </Link>
   );

@@ -38,7 +38,7 @@ const Footer: React.FC<IFooterProp> = ({ className }) => {
             )}
           </span>
           <div className="flex space-x-6 text-sm font-medium text-body sm:justify-center">
-            {process.env.NEXT_PUBLIC_VERSION}
+            {process.env.NEXT_PUBLIC_VERSION ?? '1.1.0'}
           </div>
         </div>
       </div>

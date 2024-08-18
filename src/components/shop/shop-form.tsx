@@ -20,7 +20,7 @@ import {
   ShopSocialInput,
   UserAddressInput,
 } from '@/types';
-import { getAuthCredentials } from '@/utils/auth-utils';
+import { getAuthCredentials, isStoreOwner } from '@/utils/auth-utils';
 import { STORE_OWNER, SUPER_ADMIN } from '@/utils/constants';
 import { getFormattedImage } from '@/utils/get-formatted-image';
 import { getIcon } from '@/utils/get-icon';
@@ -41,6 +41,16 @@ import StickyFooterPanel from '@/components/ui/sticky-footer-panel';
 import { socialIcon } from '@/settings/site.settings';
 import { ShopDescriptionSuggestion } from '@/components/shop/shop-ai-prompt';
 import PhoneNumberInput from '@/components/ui/phone-input';
+import { useMutation } from 'react-query';
+import {
+  CreateShopDataType,
+  createShopFn,
+  EditShopDataType,
+  editShopFn,
+} from '@/services/shop';
+import { toast } from 'react-toastify';
+import { Routes } from '@/config/routes';
+import { getErrorMessage } from '@/utils/helpers';
 
 // const socialIcon = [
 //   {
@@ -79,22 +89,21 @@ export const updatedIcons = socialIcon.map((item: any) => {
 
 type FormValues = {
   name: string;
-  slug: string;
   description: string;
-  cover_image: any;
-  logo: any;
-  balance: BalanceInput;
+  cover_image: File | string;
+  image: File | string;
   address: UserAddressInput;
-  settings: ShopSettings;
 };
 
-const ShopForm = ({ initialValues }: { initialValues?: any }) => {
-  const [location] = useAtom(locationAtom);
-  const { mutate: createShop, isLoading: creating } = useCreateShopMutation();
-  const { mutate: updateShop, isLoading: updating } = useUpdateShopMutation();
+const ShopForm = ({ initialValues }: { initialValues?: EditShopDataType }) => {
+  // const [location] = useAtom(locationAtom);
+  // const { mutate: createShop, isLoading: creating } = useCreateShopMutation();
+  // const { mutate: updateShop, isLoading: updating } = useUpdateShopMutation();
   // const { permissions } = getAuthCredentials();
   // let permission = hasAccess(adminAndOwnerOnly, permissions);
-  const { permissions } = getAuthCredentials();
+  // const { permissions } = getAuthCredentials();
+
+  // console.log('init val', initialValues?.address[0]);
   const {
     register,
     handleSubmit,
@@ -109,35 +118,33 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
       ? {
           defaultValues: {
             ...initialValues,
-            logo: getFormattedImage(initialValues.logo),
-            cover_image: getFormattedImage(initialValues.cover_image),
-            settings: {
-              ...initialValues?.settings,
-              socials: initialValues?.settings?.socials
-                ? initialValues?.settings?.socials.map((social: any) => ({
-                    icon: updatedIcons?.find(
-                      (icon) => icon?.value === social?.icon,
-                    ),
-                    url: social?.url,
-                  }))
-                : [],
+            image: initialValues.image as string,
+            cover_image: initialValues.cover_image as string,
+            name: initialValues.name,
+            description: initialValues.description,
+            address: {
+              street_address: initialValues.address[0],
+              city: initialValues.address[1],
+              state: initialValues.address[2],
+              country: initialValues.address[3],
             },
           },
         }
       : {}),
     //@ts-ignore
-    resolver: yupResolver(shopValidationSchema),
+    // resolver: yupResolver(shopValidationSchema),
   });
+
   const router = useRouter();
 
   const { openModal } = useModalAction();
   const { locale } = router;
-  const {
-    // @ts-ignore
-    settings: { options },
-  } = useSettingsQuery({
-    language: locale!,
-  });
+  // const {
+  //   // @ts-ignore
+  //   settings: { options },
+  // } = useSettingsQuery({
+  //   language: locale!,
+  // });
 
   const generateName = watch('name');
   const shopDescriptionSuggestionLists = useMemo(() => {
@@ -156,50 +163,89 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
 
   const slugAutoSuggest = formatSlug(watch('name'));
   const { t } = useTranslation();
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'settings.socials',
-  });
+  // const { fields, append, remove } = useFieldArray({
+  //   control,
+  //   name: 'settings.socials',
+  // });
 
   const [isSlugDisable, setIsSlugDisable] = useState<boolean>(true);
   const isSlugEditable =
     (router?.query?.action === 'edit' || router?.pathname === '/[shop]/edit') &&
     router?.locale === Config.defaultLanguage;
   function onSubmit(values: FormValues) {
-    const settings = {
-      ...values?.settings,
-      location: { ...omit(values?.settings?.location, '__typename') },
-      socials: values?.settings?.socials
-        ? values?.settings?.socials?.map((social: any) => ({
-            icon: social?.icon?.value,
-            url: social?.url,
-          }))
-        : [],
-    };
+    // console.log('lipppppp', values);
+
+    // const settings = {
+    //   ...values?.settings,
+    //   location: { ...omit(values?.settings?.location, '__typename') },
+    //   socials: values?.settings?.socials
+    //     ? values?.settings?.socials?.map((social: any) => ({
+    //         icon: social?.icon?.value,
+    //         url: social?.url,
+    //       }))
+    //     : [],
+    // };
     if (initialValues) {
-      const { ...restAddress } = values.address;
-      updateShop({
-        id: initialValues.id,
-        ...values,
-        address: restAddress,
-        settings,
-        balance: {
-          id: initialValues.balance?.id,
-          ...values.balance,
-        },
-      });
+      const data: EditShopDataType = {
+        uid: initialValues.uid,
+        address: [
+          `${values.address.street_address}`,
+          `${values.address.city}`,
+          `${values.address.state} `,
+          `${values.address.country}`,
+        ],
+        description: values.description,
+      };
+
+      updateShop.mutate(data);
     } else {
-      createShop({
+      if (
+        !values.address ||
+        !values.cover_image ||
+        !values.description ||
+        !values.image ||
+        !values.name
+      ) {
+        toast.error('All fields are required');
+      }
+      const data = {
         ...values,
-        settings,
-        balance: {
-          ...values.balance,
-        },
-      });
+        cover_image: values.cover_image as File,
+        image: values.image as File,
+        address: [
+          `${values.address.street_address}`,
+          `${values.address.city}`,
+          `${values.address.state} `,
+          `${values.address.country}`,
+        ],
+      } satisfies CreateShopDataType;
+
+      createShop.mutate(data);
     }
   }
 
-  const isGoogleMapActive = options?.useGoogleMap;
+  const createShop = useMutation({
+    mutationFn: createShopFn,
+    onSuccess: () => {
+      toast.success('Shop created successfully');
+      router.push(Routes.dashboard);
+    },
+    onError: (err: any) => {
+      toast.error(getErrorMessage(err));
+    },
+  });
+  const updateShop = useMutation({
+    mutationFn: editShopFn,
+    onSuccess: () => {
+      toast.success('Shop updated successfully');
+      router.push(Routes.dashboard);
+    },
+    onError: (err: any) => {
+      toast.error(getErrorMessage(err));
+    },
+  });
+
+  // const isGoogleMapActive = options?.useGoogleMap;
 
   const coverImageInformation = (
     <span>
@@ -220,7 +266,13 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
           />
 
           <Card className="w-full sm:w-8/12 md:w-2/3">
-            <FileInput name="logo" control={control} multiple={false} />
+            <FileInput
+              name="image"
+              control={control}
+              multiple={false}
+              defaultImage={initialValues?.image as string}
+              disabled={!!initialValues?.image}
+            />
           </Card>
         </div>
 
@@ -232,7 +284,13 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
           />
 
           <Card className="w-full sm:w-8/12 md:w-2/3">
-            <FileInput name="cover_image" control={control} multiple={false} />
+            <FileInput
+              name="cover_image"
+              control={control}
+              multiple={false}
+              defaultImage={initialValues?.cover_image as string}
+              disabled={!!initialValues?.cover_image}
+            />
           </Card>
         </div>
         <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
@@ -244,14 +302,17 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
           <Card className="w-full sm:w-8/12 md:w-2/3">
             <Input
               label={t('form:input-label-name')}
-              {...register('name')}
+              {...register('name', {
+                required: 'Name is required',
+              })}
               variant="outline"
               className="mb-5"
               error={t(errors.name?.message!)}
+              disabled={!!initialValues?.name}
               required
             />
 
-            {isSlugEditable ? (
+            {/* {isSlugEditable ? (
               <div className="relative mb-5">
                 <Input
                   label={t('form:input-label-slug')}
@@ -278,25 +339,28 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
                 className="mb-5"
                 disabled
               />
-            )}
+            )} */}
 
             <div className="relative">
-              {options?.useAi && (
+              {/* {options?.useAi && (
                 <OpenAIButton
                   title={t('form:button-label-description-ai')}
                   onClick={handleGenerateDescription}
                 />
-              )}
+              )} */}
               <TextArea
                 label={t('form:input-label-description')}
-                {...register('description')}
+                {...register('description', {
+                  required: 'Description is required',
+                })}
                 variant="outline"
                 error={t(errors.description?.message!)}
+                required
               />
             </div>
           </Card>
         </div>
-        <div className="flex flex-wrap pb-8 my-5 border-b border-gray-300 border-dashed sm:my-8">
+        {/* <div className="flex flex-wrap pb-8 my-5 border-b border-gray-300 border-dashed sm:my-8">
           <Description
             title={t('form:shop-payment-info')}
             details={t('form:payment-info-helper-text')}
@@ -336,7 +400,7 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
               required
             />
           </Card>
-        </div>
+        </div> */}
         <div className="flex flex-wrap pb-8 my-5 border-b border-gray-300 border-dashed sm:my-8">
           <Description
             title={t('form:shop-address')}
@@ -345,7 +409,7 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
           />
 
           <Card className="w-full sm:w-8/12 md:w-2/3">
-            {isGoogleMapActive && (
+            {/* {isGoogleMapActive && (
               <div className="mb-5">
                 <Label>{t('form:input-label-autocomplete')}</Label>
                 <Controller
@@ -371,45 +435,58 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
                   )}
                 />
               </div>
-            )}
+            )} */}
             <Input
               label={t('form:input-label-country')}
-              {...register('address.country')}
+              {...register('address.country', {
+                required: 'Country is required',
+              })}
               variant="outline"
               className="mb-5"
               error={t(errors.address?.country?.message!)}
+              required
             />
-            <Input
-              label={t('form:input-label-city')}
-              {...register('address.city')}
-              variant="outline"
-              className="mb-5"
-              error={t(errors.address?.city?.message!)}
-            />
+
             <Input
               label={t('form:input-label-state')}
-              {...register('address.state')}
+              {...register('address.state', {
+                required: 'State is required',
+              })}
               variant="outline"
               className="mb-5"
               error={t(errors.address?.state?.message!)}
+              required
             />
             <Input
+              label={t('form:input-label-city')}
+              {...register('address.city', {
+                required: 'City is required',
+              })}
+              variant="outline"
+              className="mb-5"
+              error={t(errors.address?.city?.message!)}
+              required
+            />
+            {/* <Input
               label={t('form:input-label-zip')}
               {...register('address.zip')}
               variant="outline"
               className="mb-5"
               error={t(errors.address?.zip?.message!)}
-            />
+            /> */}
             <TextArea
               label={t('form:input-label-street-address')}
-              {...register('address.street_address')}
+              {...register('address.street_address', {
+                required: 'Address is required',
+              })}
               variant="outline"
               error={t(errors.address?.street_address?.message!)}
+              required
             />
           </Card>
         </div>
 
-        {permissions?.includes(STORE_OWNER) ? (
+        {/* {isStoreOwner() ? (
           <div className="flex flex-wrap pb-8 my-5 border-b border-dashed border-border-base sm:my-8">
             <Description
               title={t('form:form-notification-title')}
@@ -441,8 +518,8 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
           </div>
         ) : (
           ''
-        )}
-        <div className="flex flex-wrap pb-8 my-5 border-b border-gray-300 border-dashed sm:my-8">
+        )} */}
+        {/* <div className="flex flex-wrap pb-8 my-5 border-b border-gray-300 border-dashed sm:my-8">
           <Description
             title={t('form:shop-settings')}
             details={t('form:shop-settings-helper-text')}
@@ -466,7 +543,7 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
               required
             />
           </Card>
-        </div>
+        </div> */}
 
         {/* <div className="flex flex-wrap pb-8 my-5 border-b border-gray-300 border-dashed sm:my-8">
           <Description
@@ -533,8 +610,8 @@ const ShopForm = ({ initialValues }: { initialValues?: any }) => {
         <StickyFooterPanel className="z-0">
           <div className="mb-5 text-end">
             <Button
-              loading={creating || updating}
-              disabled={creating || updating}
+              loading={createShop.isLoading || updateShop.isLoading}
+              disabled={createShop.isLoading || updateShop.isLoading}
             >
               {initialValues
                 ? t('form:button-label-update')

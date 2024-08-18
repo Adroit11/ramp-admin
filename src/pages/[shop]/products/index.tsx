@@ -21,14 +21,23 @@ import {
   adminOnly,
   adminOwnerAndStaffOnly,
   getAuthCredentials,
+  getUserAuthData,
   hasAccess,
 } from '@/utils/auth-utils';
 import cn from 'classnames';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import PageHeading from '@/components/common/page-heading';
+import { useAuth } from '@/hooks/useAuth';
+import { useQuery } from 'react-query';
+import { getShopDetailsFn, getShopProductsFn } from '@/services/shop';
+import {
+  GetShopDetailsTypeForOwner,
+  GetShopProductTypeForOwner,
+} from '@/types/shops';
+import { getErrorMessage } from '@/utils/helpers';
 
 interface ProductTypeOptions {
   name: string;
@@ -37,15 +46,18 @@ interface ProductTypeOptions {
 
 export default function ProductsPage() {
   const router = useRouter();
-  const { permissions } = getAuthCredentials();
-  const { data: me } = useMeQuery();
+  // const { permissions } = getAuthCredentials();
+  // const { data: me } = useMeQuery();
+  const userAuthData = getUserAuthData();
+  const { user, isLoading } = useAuth();
   const {
     query: { shop },
   } = useRouter();
-  const { data: shopData, isLoading: fetchingShop } = useShopQuery({
-    slug: shop as string,
-  });
-  const shopId = shopData?.id!;
+  // const { data: shopData, isLoading: fetchingShop } = useShopQuery({
+  //   slug: shop as string,
+  // });
+
+  // const shopId = shopData?.id!;
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [type, setType] = useState('');
@@ -62,31 +74,57 @@ export default function ProductsPage() {
     setVisible((v) => !v);
   };
 
-  const { products, paginatorInfo, loading, error } = useProductsQuery(
-    {
-      language: locale,
-      name: searchTerm,
-      limit: 20,
-      shop_id: shopId,
-      type,
-      categories: category,
-      product_type: productType,
-      orderBy,
-      sortedBy,
-      page,
-    },
-    {
-      enabled: Boolean(shopId),
+  // const { products, paginatorInfo, loading, error } = useProductsQuery(
+  //   {
+  //     language: locale,
+  //     name: searchTerm,
+  //     limit: 20,
+  //     shop_id: shopId,
+  //     type,
+  //     categories: category,
+  //     product_type: productType,
+  //     orderBy,
+  //     sortedBy,
+  //     page,
+  //   },
+  //   {
+  //     enabled: Boolean(shopId),
+  //   },
+  // );
+
+  const getShopQuery = useQuery(['get_shop_detail', shop?.toString()], () => {
+    return getShopDetailsFn(shop?.toString() ?? '');
+  });
+
+  const shopData = useMemo(() => {
+    if (getShopQuery.data?.data) {
+      return getShopQuery.data.data as GetShopDetailsTypeForOwner;
+    }
+    return null;
+  }, [getShopQuery.isLoading, getShopQuery.data]);
+
+  // ADD GET PRODUCT AND ADD A TYPE
+  const getShopProductsQuery = useQuery(
+    ['get_shop_products', shop?.toString()],
+    () => {
+      return getShopProductsFn(shop?.toString() ?? '');
     },
   );
 
+  const shopProductsData = useMemo(() => {
+    if (getShopProductsQuery.data?.data) {
+      return getShopProductsQuery.data.data as GetShopProductTypeForOwner[];
+    }
+    return [];
+  }, [getShopProductsQuery.isLoading, getShopProductsQuery.data]);
+
   function handleImportModal() {
-    openModal('EXPORT_IMPORT_PRODUCT', shopId);
+    openModal('EXPORT_IMPORT_PRODUCT', shopData?.uid);
   }
 
-  if (loading || fetchingShop)
-    return <Loader text={t('common:text-loading')} />;
-  if (error) return <ErrorMessage message={error.message} />;
+  if (getShopQuery.isLoading) return <Loader text={t('common:text-loading')} />;
+  if (getShopQuery.isError)
+    return <ErrorMessage message={getErrorMessage(getShopQuery.error)} />;
 
   function handleSearch({ searchText }: { searchText: string }) {
     setSearchTerm(searchText);
@@ -96,11 +134,7 @@ export default function ProductsPage() {
     setPage(current);
   }
 
-  if (
-    !hasAccess(adminOnly, permissions) &&
-    !me?.shops?.map((shop) => shop.id).includes(shopId) &&
-    me?.managed_shop?.id != shopId
-  ) {
+  if (!userAuthData?.permissions?.products.includes('view-products')) {
     router.replace(Routes.dashboard);
   }
 
@@ -192,8 +226,9 @@ export default function ProductsPage() {
         </div>
       </Card>
       <ProductList
-        products={products}
-        paginatorInfo={paginatorInfo}
+        products={shopProductsData}
+        // paginatorInfo={paginatorInfo}
+        paginatorInfo={null}
         onPagination={handlePagination}
         onOrder={setOrder}
         onSort={setColumn}

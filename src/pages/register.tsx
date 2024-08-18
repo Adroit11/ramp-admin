@@ -3,7 +3,11 @@ import { GetStaticProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import RegistrationForm from '@/components/auth/registration-form';
 import { useRouter } from 'next/router';
-import { getAuthCredentials, isAuthenticated } from '@/utils/auth-utils';
+import {
+  getAuthCredentials,
+  isAuthenticated,
+  isUserAuthenticated,
+} from '@/utils/auth-utils';
 import { Routes } from '@/config/routes';
 import AuthPageLayout from '@/components/layouts/auth-layout';
 
@@ -15,8 +19,9 @@ export const getStaticProps: GetStaticProps = async ({ locale }) => ({
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { token, permissions } = getAuthCredentials();
-  if (isAuthenticated({ token, permissions })) {
+  // const { token, permissions } = getAuthCredentials();
+  // if (isAuthenticated({ token, permissions })) {
+  if (isUserAuthenticated()) {
     router.replace(Routes.dashboard);
   }
   const { t } = useTranslation('common');

@@ -12,6 +12,7 @@ import {
   adminOnly,
   adminOwnerAndStaffOnly,
   getAuthCredentials,
+  getUserAuthData,
   hasAccess,
 } from '@/utils/auth-utils';
 import { formatAddress } from '@/utils/format-address';
@@ -40,91 +41,102 @@ import Link from '@/components/ui/link';
 import { PaymentInfo } from '@/types';
 import { useFormatPhoneNumber } from '@/utils/format-phone-number';
 import { useSettingsQuery } from '@/data/settings';
+import { useAuth } from '@/hooks/useAuth';
+import { useQuery } from 'react-query';
+import { getShopDetailsFn } from '@/services/shop';
+import { convertShopAddres, getErrorMessage } from '@/utils/helpers';
+import { useMemo } from 'react';
+import { GetShopDetailsTypeForOwner } from '@/types/shops';
 
 export default function ShopPage() {
   const router = useRouter();
   const { t } = useTranslation();
-  const { permissions, role } = getAuthCredentials();
-  const { data: me } = useMeQuery();
+  // const { permissions, role } = getAuthCredentials();
+  const userAuthData = getUserAuthData();
+  // const { data: me } = useMeQuery();
+  const { user, isLoading } = useAuth();
   const {
     query: { shop },
     locale,
   } = useRouter();
-  const { settings } = useSettingsQuery({
-    language: locale!,
+  // const { settings } = useSettingsQuery({
+  //   language: locale!,
+  // });
+  // const {
+  //   data,
+  //   isLoading: loading,
+  //   error,
+  // } = useShopQuery({
+  //   slug: shop!.toString(),
+  // });
+  // const { price: totalEarnings } = usePrice(
+  //   data && {
+  //     amount: data?.balance?.total_earnings!,
+  //   }
+  // );
+  // const { price: currentBalance } = usePrice(
+  //   data && {
+  //     amount: data?.balance?.current_balance!,
+  //   }
+  // );
+
+  // const phoneNumber = useFormatPhoneNumber({
+  //   customer_contact: data?.settings?.contact as string,
+  // });
+
+  const getShopQuery = useQuery(['get_shop_detail', shop?.toString()], () => {
+    return getShopDetailsFn(shop?.toString() ?? '');
   });
-  const {
-    data,
-    isLoading: loading,
-    error,
-  } = useShopQuery({
-    slug: shop!.toString(),
-  });
-  const { price: totalEarnings } = usePrice(
-    data && {
-      amount: data?.balance?.total_earnings!,
+
+  const shopData = useMemo(() => {
+    if (getShopQuery.data?.data) {
+      return getShopQuery.data.data as GetShopDetailsTypeForOwner;
     }
-  );
-  const { price: currentBalance } = usePrice(
-    data && {
-      amount: data?.balance?.current_balance!,
-    }
-  );
+    return null;
+  }, [getShopQuery.isLoading, getShopQuery.data]);
 
-  const phoneNumber = useFormatPhoneNumber({
-    customer_contact: data?.settings?.contact as string,
-  });
+  if (getShopQuery.isLoading) return <Loader text={t('common:text-loading')} />;
+  if (getShopQuery.isError)
+    return <ErrorMessage message={getErrorMessage(getShopQuery.error)} />;
 
-  if (loading) return <Loader text={t('common:text-loading')} />;
-  if (error) return <ErrorMessage message={error.message} />;
-  const {
-    name,
-    is_active,
-    logo,
-    cover_image,
-    description,
-    products_count,
-    orders_count,
-    balance,
-    address,
-    created_at,
-    slug,
-    owner,
-    id: shop_id,
-  } = data ?? {};
+  // const {
+  //   name,
+  //   is_active,
+  //   logo,
+  //   cover_image,
+  //   description,
+  //   products_count,
+  //   orders_count,
+  //   balance,
+  //   address,
+  //   created_at,
+  //   slug,
+  //   owner,
+  //   id: shop_id,
+  // } = data ?? {};
 
-  if (
-    !hasAccess(adminOnly, permissions) &&
-    !me?.shops?.map((shop) => shop.id).includes(shop_id) &&
-    me?.managed_shop?.id != shop_id
-  ) {
+  if (!userAuthData?.permissions?.shops?.includes('view-shops')) {
     router.replace(Routes.dashboard);
   }
-  console.log(settings?.options?.maintenance?.isUnderMaintenance);
+
   return (
     <div className="-m-5 md:-m-8">
-      {!is_active && (
+      {!shopData?.is_active ? (
         <Alert
           className="mb-4"
           message={t('common:text-permission-message')}
           variant="error"
         />
-      )}
-      {/* {settings?.options?.maintenance?.isUnderMaintenance && (
-        <Alert
-          className="mb-4"
-          message="Site is under maintenance."
-          variant="info"
-        />
-      )} */}
+      ) : null}
+
       <div className="relative h-[20rem] bg-white lg:h-[37.5rem]">
         <Image
-          src={cover_image?.original ?? '/shop-fallback-cover-photo.png'}
+          src={shopData?.cover_image ?? '/shop-fallback-cover-photo.png'}
           // fill
           height={600}
           width={1200}
           sizes="(max-width: 768px) 100vw"
-          alt={Object(name)}
+          alt={shopData?.name ?? ''}
           className="h-full w-full object-cover"
         />
       </div>
@@ -132,36 +144,36 @@ export default function ShopPage() {
         <div className="-mt-16 flex flex-wrap gap-6 lg:-mt-[6.0625rem] 2xl:flex-nowrap">
           <div className="shrink-0">
             <ShopAvatar
-              is_active={is_active}
-              name={name}
-              logo={logo}
+              is_active={!!shopData?.is_active}
+              name={shopData?.name ?? 'N/a'}
+              logo={shopData?.logo ?? ''}
               size="medium"
             />
           </div>
           <div className="flex w-full flex-wrap justify-between self-end 2xl:flex-1">
             <div className="flex-auto pr-5 xl:flex-1">
               <div className="mb-3 flex items-center gap-2 text-2xl">
-                {name ? (
+                {shopData?.name ? (
                   <h1 className="font-semibold leading-none text-muted-black">
-                    {name}
+                    {shopData.name}
                   </h1>
                 ) : (
                   ''
                 )}
-                <Link
+                {/* <Link
                   href={Routes.visitStore(`authors/${slug as string}`)}
                   target="_blank"
                   className="text-[#666666] transition-colors duration-300 hover:text-opacity-60"
                 >
                   <ExternalLinkIcon />
-                </Link>
+                </Link> */}
               </div>
               <div className="flex flex-col space-y-3 divide-[#E7E7E7] leading-none xl:flex-row xl:space-y-0 xl:space-x-5 xl:divide-x">
-                {owner?.email ? (
+                {shopData?.owner?.email ? (
                   <ContentListHorizontal
-                    content={owner?.email}
+                    content={shopData.owner.email}
                     isLink
-                    link={`mailto:${owner?.email}`}
+                    link={`mailto:${shopData.owner.email}`}
                   >
                     <EmailAtIcon />
                   </ContentListHorizontal>
@@ -169,12 +181,12 @@ export default function ShopPage() {
                   ''
                 )}
 
-                {!isEmpty(formatAddress(address!)) ? (
+                {!isEmpty(shopData?.address) ? (
                   <ContentListHorizontal
-                    content={formatAddress(address!) as string}
+                    content={convertShopAddres(shopData?.address)}
                     className="xl:pl-5"
-                    link={`https://www.google.com/maps/place/${formatAddress(
-                      address!,
+                    link={`https://www.google.com/maps/place/${convertShopAddres(
+                      shopData?.address,
                     )}`}
                     isLink
                   >
@@ -184,7 +196,7 @@ export default function ShopPage() {
                   ''
                 )}
 
-                {phoneNumber ? (
+                {/* {phoneNumber ? (
                   <ContentListHorizontal
                     content={phoneNumber}
                     isLink
@@ -195,10 +207,10 @@ export default function ShopPage() {
                   </ContentListHorizontal>
                 ) : (
                   ''
-                )}
+                )} */}
               </div>
             </div>
-            {hasAccess(adminAndOwnerOnly, permissions) && (
+            {userAuthData?.permissions?.shops?.includes('create-shop') && (
               <div className="self-end pt-4 xl:pt-0">
                 <Link
                   className="inline-flex items-center gap-1 rounded-full bg-accent px-[0.625rem] py-[0.5625rem] text-xs font-medium text-white hover:bg-accent-hover"
@@ -217,65 +229,65 @@ export default function ShopPage() {
           <div className="relative w-full shrink-0 overflow-hidden rounded-lg bg-white p-4 lg:w-[18rem] lg:p-6 xl:w-[22.375rem] xl:p-8">
             <ContentListVertical
               title={t('common:text-registered-since')}
-              content={dayjs(created_at).format('MMMM D, YYYY')}
+              content={dayjs(shopData?.created_at).format('MMMM D, YYYY')}
             />
 
-            {description ? (
+            {shopData?.description ? (
               <div className="relative mt-5 pt-5 xl:mt-7 xl:pt-7">
                 <h2 className="mb-4 text-lg font-semibold text-muted-black xl:text-xl">
                   {t('common:text-bio')}
                 </h2>
 
-                <ShortDescription content={description} character={90} />
+                <ShortDescription
+                  content={shopData.description}
+                  character={90}
+                />
                 <div className="absolute top-0 -left-8 w-[calc(100%+64px)] border-b border-dashed border-b-[#F0F0F0]" />
               </div>
             ) : (
               ''
             )}
 
-            <PaymentInfoList payment={balance?.payment_info as PaymentInfo} />
+            {/* <PaymentInfoList payment={balance?.payment_info as PaymentInfo} /> */}
           </div>
 
           {/* Dashboard */}
           <div className="w-full flex-1 rounded-lg bg-white p-4 lg:p-6 xl:p-7 2xl:p-10">
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 xl:gap-5 2xl:grid-cols-3 2xl:gap-7">
               <IconCard
-                content={products_count?.toString() as string}
+                content={'0'}
                 title={t('common:text-total-products')}
                 icon="ProductsIcon"
               />
               <IconCard
-                content={orders_count?.toString() as string}
+                content={'0'}
                 title={t('common:text-total-orders')}
                 icon="OrdersIcon"
                 iconClassName="text-[#FF8D29]"
                 iconInnerClassName="bg-[#FFF0E2]"
               />
-              {role !== 'staff' ? (
-                <>
-                  <IconCard
-                    content={`${balance?.admin_commission_rate ?? 0}%`}
-                    title={t('common:text-commission-rate')}
-                    icon="CommissionIcon"
-                    iconClassName="text-[#DF0D00]"
-                    iconInnerClassName="bg-[#FFF7F6]"
-                  />
-                  <IconCard
-                    content={totalEarnings as string}
-                    title={t('common:text-gross-sales')}
-                    icon="GrossSaleIcon"
-                    iconClassName="text-[#00AAFF]"
-                    iconInnerClassName="bg-[#EFFAFF]"
-                  />
-                  <IconCard
-                    content={currentBalance as string}
-                    title={t('common:text-current-balance')}
-                    icon="CurrentBalanceIcon"
-                    iconClassName="text-[#0017E1]"
-                    iconInnerClassName="bg-[#F0F2FF]"
-                  />
-                </>
-              ) : null}
+
+              {/* <IconCard
+                content={'0'}
+                title={t('common:text-commission-rate')}
+                icon="CommissionIcon"
+                iconClassName="text-[#DF0D00]"
+                iconInnerClassName="bg-[#FFF7F6]"
+              />
+              <IconCard
+                content={'0'}
+                title={t('common:text-gross-sales')}
+                icon="GrossSaleIcon"
+                iconClassName="text-[#00AAFF]"
+                iconInnerClassName="bg-[#EFFAFF]"
+              />
+              <IconCard
+                content={'0'}
+                title={t('common:text-current-balance')}
+                icon="CurrentBalanceIcon"
+                iconClassName="text-[#0017E1]"
+                iconInnerClassName="bg-[#F0F2FF]"
+              /> */}
             </div>
           </div>
         </div>

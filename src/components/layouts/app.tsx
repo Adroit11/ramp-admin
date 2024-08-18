@@ -1,3 +1,4 @@
+import { getUserAuthData } from '@/utils/auth-utils';
 import { SUPER_ADMIN } from '@/utils/constants';
 import dynamic from 'next/dynamic';
 
@@ -10,7 +11,9 @@ export default function AppLayout({
 }: {
   userPermissions: string[];
 }) {
-  if (userPermissions?.includes(SUPER_ADMIN)) {
+  const userAuthData = getUserAuthData();
+  // console.log('fff', userPermissions, userAuthData);
+  if (userAuthData?.role === 'super_admin') {
     return <AdminLayout {...props} />;
   }
   return <OwnerLayout {...props} />;

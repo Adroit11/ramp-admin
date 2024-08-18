@@ -31,6 +31,7 @@ const SideBarMenu = () => {
               {t('text-nav-menu')}
             </h3>
           )}
+
           <div className="space-y-2">
             {sidebarLinks?.ownerDashboard?.map((item, index) => {
               return (
@@ -48,7 +49,7 @@ const SideBarMenu = () => {
                             ? 'bg-accent/10 hover:!bg-accent/10'
                             : null
                         }`
-                      : null
+                      : null,
                   )}
                   title={t(item?.label)}
                 >
@@ -57,7 +58,7 @@ const SideBarMenu = () => {
                       pathname === item?.href
                         ? 'text-accent'
                         : 'text-gray-600 group-focus:text-accent',
-                      miniSidebar && width >= RESPONSIVE_WIDTH ? 'm-auto' : ''
+                      miniSidebar && width >= RESPONSIVE_WIDTH ? 'm-auto' : '',
                     )}
                   >
                     {getIcon({

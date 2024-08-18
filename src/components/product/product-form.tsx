@@ -6,7 +6,7 @@ import Description from '@/components/ui/description';
 import Card from '@/components/common/card';
 import Label from '@/components/ui/label';
 import Radio from '@/components/ui/radio/radio';
-import { useRouter } from 'next/router';
+import Router, { useRouter } from 'next/router';
 import { yupResolver } from '@hookform/resolvers/yup';
 import FileInput from '@/components/ui/file-input';
 import { productValidationSchema } from './product-validation-schema';
@@ -30,13 +30,17 @@ import {
   getProductInputValues,
   ProductFormValues,
 } from './form-utils';
-import { getErrorMessage } from '@/utils/form-error';
 import {
   useCreateProductMutation,
   useUpdateProductMutation,
 } from '@/data/product';
 import { split, join, isEmpty } from 'lodash';
-import { adminOnly, getAuthCredentials, hasAccess } from '@/utils/auth-utils';
+import {
+  adminOnly,
+  getAuthCredentials,
+  getUserAuthData,
+  hasAccess,
+} from '@/utils/auth-utils';
 import { useSettingsQuery } from '@/data/settings';
 import Tooltip from '@/components/ui/tooltip';
 import { useModalAction } from '@/components/ui/modal/modal.context';
@@ -48,6 +52,16 @@ import StickyFooterPanel from '@/components/ui/sticky-footer-panel';
 import Link from '../ui/link';
 import { EyeIcon } from '../icons/category/eyes-icon';
 import { UpdateIcon } from '../icons/update';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import {
+  createShopProductFn,
+  editShopProductFn,
+  getShopDetailsFn,
+} from '@/services/shop';
+import { GetShopDetailsTypeForOwner } from '@/types/shops';
+import { toast } from 'react-toastify';
+import { Routes } from '@/config/routes';
+import { getErrorMessage } from '@/utils/helpers';
 
 export const chatbotAutoSuggestion = ({ name }: { name: string }) => {
   return [
@@ -101,20 +115,23 @@ type ProductFormProps = {
 export default function CreateOrUpdateProductForm({
   initialValues,
 }: ProductFormProps) {
+  const queryClient = useQueryClient();
   const router = useRouter();
   const { locale } = router;
-  const {
-    // @ts-ignore
-    settings: { options },
-  } = useSettingsQuery({
-    language: locale!,
-  });
+  // const {
+  //   // @ts-ignore
+  //   settings: { options },
+  // } = useSettingsQuery({
+  //   language: locale!,
+  // });
   const [isSlugDisable, setIsSlugDisable] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { t } = useTranslation();
   const { openModal } = useModalAction();
-  const { permissions } = getAuthCredentials();
-  let permission = hasAccess(adminOnly, permissions);
+  // const { permissions } = getAuthCredentials();
+  // let permission = hasAccess(adminOnly, permissions);
+  const userAuthData = getUserAuthData();
+
   let statusList = [
     {
       label: 'form:input-label-under-review',
@@ -128,16 +145,31 @@ export default function CreateOrUpdateProductForm({
     },
   ];
 
-  const { data: shopData } = useShopQuery(
-    { slug: router.query.shop as string },
-    {
-      enabled: !!router.query.shop,
+  // const { data: shopData } = useShopQuery(
+  //   { slug: router.query.shop as string },
+  //   {
+  //     enabled: !!router.query.shop,
+  //   },
+  // );
+  // const shopId = shopData?.id!;
+
+  const getShopQuery = useQuery(
+    ['get_shop_detail', router.query.shop as string],
+    () => {
+      return getShopDetailsFn((router.query.shop as string) ?? '');
     },
   );
-  const shopId = shopData?.id!;
+
+  const shopData = useMemo(() => {
+    if (getShopQuery.data?.data) {
+      return getShopQuery.data.data as GetShopDetailsTypeForOwner;
+    }
+    return null;
+  }, [getShopQuery.isLoading, getShopQuery.data]);
+
   const isNewTranslation = router?.query?.action === 'translate';
   const showPreviewButton =
-    router?.query?.action === 'edit' && Boolean(initialValues?.slug);
+    router?.query?.action === 'edit' && Boolean(initialValues?.uid);
   const isSlugEditable =
     router?.query?.action === 'edit' &&
     router?.locale === Config.defaultLanguage;
@@ -157,149 +189,182 @@ export default function CreateOrUpdateProductForm({
     watch,
     formState: { errors },
   } = methods;
+  console.log('ffreeeee', errors);
+  // const upload_max_filesize = options?.server_info?.upload_max_filesize / 1024;
 
-  const upload_max_filesize = options?.server_info?.upload_max_filesize / 1024;
-
-  const { mutate: createProduct, isLoading: creating } =
-    useCreateProductMutation();
-  const { mutate: updateProduct, isLoading: updating } =
-    useUpdateProductMutation();
+  // const { mutate: createProduct, isLoading: creating } =
+  //   useCreateProductMutation();
+  // const { mutate: updateProduct, isLoading: updating } =
+  //   useUpdateProductMutation();
 
   const onSubmit = async (values: ProductFormValues) => {
-    const inputValues = {
-      language: router.locale,
-      ...getProductInputValues(values, initialValues, isNewTranslation),
-    };
-
+    console.log('vals areeeee', values);
+    // const inputValues = {
+    //   language: router.locale,
+    //   ...getProductInputValues(values, initialValues, isNewTranslation),
+    // };
     try {
-      if (
-        !initialValues ||
-        !initialValues.translated_languages.includes(router.locale!)
-      ) {
-        //@ts-ignore
-        createProduct({
-          ...inputValues,
-          ...(initialValues?.slug && { slug: initialValues.slug }),
-          shop_id: shopId || initialValues?.shop_id,
+      if (!initialValues) {
+        if (!values.gallery || !values.image) {
+          toast.error('All fields are required');
+          return;
+        }
+
+        createShopProduct.mutate({
+          cover_image: values.gallery as File,
+          image: values.image!,
+          description: values.description!,
+          name: values.name,
+          price: `${values.price}`,
+          quantity: `${values.quantity ?? 1}`,
+          shop_uid: router.query.shop as string,
         });
       } else {
-        //@ts-ignore
-        updateProduct({
-          ...inputValues,
-          id: initialValues.id!,
-          shop_id: initialValues.shop_id!,
+        const newData = {
+          ...values,
+          uid: initialValues.uid,
+        };
+        updateShopProduct.mutate({
+          uid: initialValues.uid,
+          description: values.description ?? initialValues.description!,
+          price: values.price ?? initialValues.price!,
+          quantity: values.quantity ?? initialValues.quantity!,
         });
       }
     } catch (error) {
-      const serverErrors = getErrorMessage(error);
-      Object.keys(serverErrors?.validation).forEach((field: any) => {
-        setError(field.split('.')[1], {
-          type: 'manual',
-          message: serverErrors?.validation[field][0],
-        });
-      });
+      toast.error(getErrorMessage(error));
     }
   };
-  const product_type = watch('product_type');
-  const is_digital = watch('is_digital');
-  const is_external = watch('is_external');
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'video',
+
+  const createShopProduct = useMutation({
+    mutationFn: createShopProductFn,
+    onSuccess: async () => {
+      const generateRedirectUrl = router.query.shop
+        ? `/${router.query.shop}${Routes.product.list}`
+        : Routes.product.list;
+      await Router.push(generateRedirectUrl, undefined, {
+        locale: Config.defaultLanguage,
+      });
+      toast.success(t('common:successfully-created'));
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries('get_shop_products');
+    },
+    onError: (err: any) => {
+      toast.error(getErrorMessage(err));
+    },
   });
-  const productName = watch('name');
 
-  const autoSuggestionList = useMemo(() => {
-    return chatbotAutoSuggestion({ name: productName ?? '' });
-  }, [productName]);
+  const updateShopProduct = useMutation({
+    mutationFn: editShopProductFn,
+    onSuccess: async () => {
+      const generateRedirectUrl = router.query.shop
+        ? `/${router.query.shop}${Routes.product.list}`
+        : Routes.product.list;
+      await Router.push(generateRedirectUrl, undefined, {
+        locale: Config.defaultLanguage,
+      });
+      toast.success('Updated successfully');
+    },
+    onError: (err: any) => {
+      toast.error(getErrorMessage(err));
+    },
+  });
 
-  const handleGenerateDescription = useCallback(() => {
-    openModal('GENERATE_DESCRIPTION', {
-      control,
-      name: productName,
-      set_value: setValue,
-      key: 'description',
-      suggestion: autoSuggestionList as ItemProps[],
-    });
-  }, [productName]);
+  // const productName = watch('name');
 
-  const slugAutoSuggest = formatSlug(watch('name'));
-  if (Boolean(options?.isProductReview)) {
-    if (permission) {
-      if (initialValues?.status !== ProductStatus?.Draft) {
-        statusList = [
-          {
-            label: 'form:input-label-published',
-            id: 'published',
-            value: ProductStatus.Publish,
-          },
-          {
-            label: 'form:input-label-approved',
-            id: 'approved',
-            value: ProductStatus.Approved,
-          },
-          {
-            label: 'form:input-label-rejected',
-            id: 'rejected',
-            value: ProductStatus.Rejected,
-          },
-          {
-            label: 'form:input-label-soft-disabled',
-            id: 'unpublish',
-            value: ProductStatus.UnPublish,
-          },
-        ];
-      } else {
-        statusList = [
-          {
-            label: 'form:input-label-draft',
-            id: 'draft',
-            value: ProductStatus.Draft,
-          },
-        ];
-      }
-    } else {
-      if (
-        initialValues?.status === ProductStatus.Publish ||
-        initialValues?.status === ProductStatus.Approved ||
-        initialValues?.status === ProductStatus.UnPublish
-      ) {
-        {
-          statusList = [
-            {
-              label: 'form:input-label-published',
-              id: 'published',
-              value: ProductStatus.Publish,
-            },
-            {
-              label: 'form:input-label-unpublish',
-              id: 'unpublish',
-              value: ProductStatus.UnPublish,
-            },
-          ];
-        }
-      }
-    }
-  } else {
-    statusList = [
-      {
-        label: 'form:input-label-published',
-        id: 'published',
-        value: ProductStatus.Publish,
-      },
-      {
-        label: 'form:input-label-draft',
-        id: 'draft',
-        value: ProductStatus.Draft,
-      },
-    ];
-  }
+  // const autoSuggestionList = useMemo(() => {
+  //   return chatbotAutoSuggestion({ name: productName ?? '' });
+  // }, [productName]);
+
+  // const handleGenerateDescription = useCallback(() => {
+  //   openModal('GENERATE_DESCRIPTION', {
+  //     control,
+  //     name: productName,
+  //     set_value: setValue,
+  //     key: 'description',
+  //     suggestion: autoSuggestionList as ItemProps[],
+  //   });
+  // }, [productName]);
+
+  // const slugAutoSuggest = formatSlug(watch('name'));
+  // if (Boolean(options?.isProductReview)) {
+
+  //   if (permission) {
+  //     if (initialValues?.status !== ProductStatus?.Draft) {
+  //       statusList = [
+  //         {
+  //           label: 'form:input-label-published',
+  //           id: 'published',
+  //           value: ProductStatus.Publish,
+  //         },
+  //         {
+  //           label: 'form:input-label-approved',
+  //           id: 'approved',
+  //           value: ProductStatus.Approved,
+  //         },
+  //         {
+  //           label: 'form:input-label-rejected',
+  //           id: 'rejected',
+  //           value: ProductStatus.Rejected,
+  //         },
+  //         {
+  //           label: 'form:input-label-soft-disabled',
+  //           id: 'unpublish',
+  //           value: ProductStatus.UnPublish,
+  //         },
+  //       ];
+  //     } else {
+  //       statusList = [
+  //         {
+  //           label: 'form:input-label-draft',
+  //           id: 'draft',
+  //           value: ProductStatus.Draft,
+  //         },
+  //       ];
+  //     }
+  //   } else {
+  //     if (
+  //       initialValues?.status === ProductStatus.Publish ||
+  //       initialValues?.status === ProductStatus.Approved ||
+  //       initialValues?.status === ProductStatus.UnPublish
+  //     ) {
+  //       {
+  //         statusList = [
+  //           {
+  //             label: 'form:input-label-published',
+  //             id: 'published',
+  //             value: ProductStatus.Publish,
+  //           },
+  //           {
+  //             label: 'form:input-label-unpublish',
+  //             id: 'unpublish',
+  //             value: ProductStatus.UnPublish,
+  //           },
+  //         ];
+  //       }
+  //     }
+  //   }
+  // } else {
+  //   statusList = [
+  //     {
+  //       label: 'form:input-label-published',
+  //       id: 'published',
+  //       value: ProductStatus.Publish,
+  //     },
+  //     {
+  //       label: 'form:input-label-draft',
+  //       id: 'draft',
+  //       value: ProductStatus.Draft,
+  //     },
+  //   ];
+  // }
 
   const featuredImageInformation = (
     <span>
       {t('form:featured-image-help-text')} <br />
       {t('form:size-help-text')} &nbsp;
-      <span className="font-bold">{upload_max_filesize} MB </span>
+      <span className="font-bold">{5} MB </span>
     </span>
   );
 
@@ -307,7 +372,7 @@ export default function CreateOrUpdateProductForm({
     <span>
       {t('form:gallery-help-text')} <br />
       {t('form:size-help-text')} &nbsp;
-      <span className="font-bold">{upload_max_filesize} MB </span>
+      <span className="font-bold">{5} MB </span>
     </span>
   );
 
@@ -332,7 +397,13 @@ export default function CreateOrUpdateProductForm({
             />
 
             <Card className="w-full sm:w-8/12 md:w-2/3">
-              <FileInput name="image" control={control} multiple={false} />
+              <FileInput
+                name="image"
+                control={control}
+                multiple={false}
+                defaultImage={initialValues?.image as string}
+                disabled={!!initialValues?.image}
+              />
               {/* {errors.image?.message && (
                 <p className="my-2 text-xs text-red-500">
                   {t(errors?.image?.message!)}
@@ -349,11 +420,16 @@ export default function CreateOrUpdateProductForm({
             />
 
             <Card className="w-full sm:w-8/12 md:w-2/3">
-              <FileInput name="gallery" control={control} />
+              <FileInput
+                name="gallery"
+                control={control}
+                multiple={false}
+                disabled={!!initialValues}
+              />
             </Card>
           </div>
 
-          <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
+          {/* <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
             <Description
               title={t('form:video-title')}
               details={t('form:video-help-text')}
@@ -361,7 +437,7 @@ export default function CreateOrUpdateProductForm({
             />
 
             <Card className="w-full sm:w-8/12 md:w-2/3">
-              {/* Video url picker */}
+               Video url picker 
               <div>
                 {fields.map((item: any, index: number) => (
                   <div
@@ -406,9 +482,9 @@ export default function CreateOrUpdateProductForm({
                 {t('form:button-label-add-video')}
               </Button>
             </Card>
-          </div>
+          </div> */}
 
-          <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
+          {/* <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
             <Description
               title={t('form:type-and-category')}
               details={t('form:type-and-category-help-text')}
@@ -421,11 +497,11 @@ export default function CreateOrUpdateProductForm({
                 error={t((errors?.type as any)?.message)}
               />
               <ProductCategoryInput control={control} setValue={setValue} />
-              {/* <ProductAuthorInput control={control} /> */}
-              {/* <ProductManufacturerInput control={control} setValue={setValue} /> */}
+              {/* <ProductAuthorInput control={control} /> 
+              {/* <ProductManufacturerInput control={control} setValue={setValue} />
               <ProductTagInput control={control} setValue={setValue} />
             </Card>
-          </div>
+          </div> */}
 
           <div className="my-5 flex flex-wrap sm:my-8">
             <Description
@@ -441,13 +517,17 @@ export default function CreateOrUpdateProductForm({
             <Card className="w-full sm:w-8/12 md:w-2/3">
               <Input
                 label={`${t('form:input-label-name')}*`}
-                {...register('name')}
+                {...register('name', {
+                  required: 'Name is required',
+                })}
                 error={t(errors.name?.message!)}
                 variant="outline"
                 className="mb-5"
+                defaultValue={initialValues?.name}
+                required
               />
 
-              {isSlugEditable ? (
+              {/* {isSlugEditable ? (
                 <div className="relative mb-5">
                   <Input
                     label={`${t('Slug')}`}
@@ -474,31 +554,35 @@ export default function CreateOrUpdateProductForm({
                   className="mb-5"
                   disabled
                 />
-              )}
-              <Input
+              )} */}
+              {/* <Input
                 label={`${t('form:input-label-unit')}*`}
                 {...register('unit')}
                 error={t(errors.unit?.message!)}
                 variant="outline"
                 className="mb-5"
-              />
+              /> */}
               <div className="relative">
-                {options?.useAi && (
+                {/* {options?.useAi && (
                   <OpenAIButton
                     title="Generate Description With AI"
                     onClick={handleGenerateDescription}
                   />
-                )}
+                )} */}
                 <TextArea
                   label={t('form:input-label-description')}
-                  {...register('description')}
+                  {...register('description', {
+                    required: 'Description is required',
+                  })}
                   error={t(errors.description?.message!)}
                   variant="outline"
                   className="mb-5"
+                  defaultValue={initialValues?.description}
+                  required
                 />
               </div>
 
-              <div>
+              {/* <div>
                 <Label>{t('form:input-label-status')}</Label>
                 {!isEmpty(statusList)
                   ? statusList?.map((status: any, index: number) => (
@@ -509,12 +593,12 @@ export default function CreateOrUpdateProductForm({
                         id={status?.id}
                         value={status?.value}
                         className="mb-2"
-                        disabled={
-                          permission &&
-                          initialValues?.status === ProductStatus?.Draft
-                            ? true
-                            : false
-                        }
+                        // disabled={
+                        //   permission &&
+                        //   initialValues?.status === ProductStatus?.Draft
+                        //     ? true
+                        //     : false
+                        // }
                       />
                     ))
                   : ''}
@@ -523,7 +607,7 @@ export default function CreateOrUpdateProductForm({
                     {t(errors?.status?.message!)}
                   </p>
                 )}
-              </div>
+              </div> */}
             </Card>
           </div>
 
@@ -565,7 +649,7 @@ export default function CreateOrUpdateProductForm({
                 </Button>
               )}
               <div className="ml-auto">
-                {showPreviewButton && (
+                {/* {showPreviewButton && (
                   <Link
                     href={`${process.env.NEXT_PUBLIC_SHOP_URL}/products/preview/${router.query.productSlug}`}
                     target="_blank"
@@ -574,10 +658,14 @@ export default function CreateOrUpdateProductForm({
                     <EyeIcon className="w-4 h-4 me-2" />
                     {t('form:button-label-preview-product-on-shop')}
                   </Link>
-                )}
+                )} */}
                 <Button
-                  loading={updating || creating}
-                  disabled={updating || creating}
+                  loading={
+                    createShopProduct.isLoading || updateShopProduct.isLoading
+                  }
+                  disabled={
+                    createShopProduct.isLoading || updateShopProduct.isLoading
+                  }
                   size="medium"
                   className="text-sm md:text-base"
                 >
