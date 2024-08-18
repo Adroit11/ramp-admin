@@ -55,7 +55,7 @@ export const useMeQuery = () => {
   //   },
   // });
 
-  return {};
+  return { data: null };
 };
 
 export function useLogin() {
