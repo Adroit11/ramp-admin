@@ -102,7 +102,7 @@ export default function ProductStockPage() {
         </div>
       </Card>
       <ProductList
-        products={products}
+        products={[]}
         paginatorInfo={paginatorInfo}
         onPagination={handlePagination}
         onOrder={setOrder}

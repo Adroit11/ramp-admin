@@ -52,7 +52,7 @@ export default function StaffsPage() {
     },
     {
       enabled: Boolean(shopId),
-    }
+    },
   );
   if (fetchingShopId || loading)
     return <Loader text={t('common:text-loading')} />;
@@ -64,7 +64,7 @@ export default function StaffsPage() {
 
   if (
     !hasAccess(adminOnly, permissions) &&
-    !me?.shops?.map((shop) => shop.id).includes(shopId) &&
+    // !me?.shops?.map((shop) => shop.id).includes(shopId) &&
     me?.managed_shop?.id != shopId
   ) {
     router.replace(Routes.dashboard);

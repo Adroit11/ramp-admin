@@ -47,7 +47,7 @@ export default function RefundsPage() {
     },
     {
       enabled: Boolean(shopId),
-    }
+    },
   );
 
   if (loading || fetchingShop)
@@ -60,7 +60,7 @@ export default function RefundsPage() {
 
   if (
     !hasAccess(adminOnly, permissions) &&
-    !me?.shops?.map((shop) => shop.id).includes(shopId) &&
+    // !me?.shops?.map((shop) => shop.id).includes(shopId) &&
     me?.managed_shop?.id != shopId
   ) {
     router.replace(Routes.dashboard);

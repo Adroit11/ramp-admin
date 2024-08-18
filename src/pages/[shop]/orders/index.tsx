@@ -56,14 +56,14 @@ export default function Orders() {
     },
     {
       enabled: Boolean(shopId),
-    }
+    },
   );
 
   const { refetch } = useExportOrderQuery(
     {
       ...(shopId && { shop_id: shopId }),
     },
-    { enabled: false }
+    { enabled: false },
   );
 
   if (loading || fetchingShop)
@@ -91,7 +91,7 @@ export default function Orders() {
 
   if (
     !hasAccess(adminOnly, permissions) &&
-    !me?.shops?.map((shop) => shop.id).includes(shopId) &&
+    // !me?.shops?.map((shop) => shop.id).includes(shopId) &&
     me?.managed_shop?.id != shopId
   ) {
     router.replace(Routes.dashboard);
@@ -111,7 +111,7 @@ export default function Orders() {
             <Search
               onSearch={handleSearch}
               placeholderText={t(
-                'form:input-placeholder-search-tracking-number'
+                'form:input-placeholder-search-tracking-number',
               )}
             />
           </div>
@@ -135,7 +135,7 @@ export default function Orders() {
               <Menu.Items
                 as="ul"
                 className={classNames(
-                  'shadow-700 absolute z-50 mt-2 w-52 overflow-hidden rounded border border-border-200 bg-light py-2 focus:outline-none ltr:right-0 ltr:origin-top-right rtl:left-0 rtl:origin-top-left'
+                  'shadow-700 absolute z-50 mt-2 w-52 overflow-hidden rounded border border-border-200 bg-light py-2 focus:outline-none ltr:right-0 ltr:origin-top-right rtl:left-0 rtl:origin-top-left',
                 )}
               >
                 <Menu.Item>
@@ -144,7 +144,7 @@ export default function Orders() {
                       onClick={handleExportOrder}
                       className={classNames(
                         'flex w-full items-center space-x-3 px-5 py-2.5 text-sm font-semibold capitalize transition duration-200 hover:text-accent focus:outline-none rtl:space-x-reverse',
-                        active ? 'text-accent' : 'text-body'
+                        active ? 'text-accent' : 'text-body',
                       )}
                     >
                       <DownloadIcon className="w-5 shrink-0" />

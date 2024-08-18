@@ -43,9 +43,10 @@ export default function UpdateAttributePage() {
   if (error) return <ErrorMessage message={error.message} />;
 
   if (
-    !hasAccess(adminOnly, permissions) &&
-    !me?.shops?.map((shop) => shop.id).includes(shopId) &&
-    me?.managed_shop?.id != shopId
+    // !hasAccess(adminOnly, permissions) &&
+    // // !me?.shops?.map((shop) => shop.id).includes(shopId) &&
+    // me?.managed_shop?.id != shopId
+    false
   ) {
     router.replace(Routes.dashboard);
   }

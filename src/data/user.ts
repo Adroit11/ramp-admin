@@ -55,7 +55,7 @@ export const useMeQuery = () => {
   //   },
   // });
 
-  return { data: null };
+  return { data: null } as { data: any };
 };
 
 export function useLogin() {

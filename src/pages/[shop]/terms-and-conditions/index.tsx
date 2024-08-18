@@ -43,10 +43,9 @@ export default function TermsAndConditions() {
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(1);
 
-
-  const { settings, loading: settingsLoading } = useSettingsQuery({
-    language: locale!,
-  });
+  // const { settings, loading: settingsLoading } = useSettingsQuery({
+  //   language: locale!,
+  // });
 
   const {
     query: { shop },
@@ -85,8 +84,7 @@ export default function TermsAndConditions() {
     setPage(current);
   };
 
-  if (settingsLoading || isLoading || loading)
-    return <Loader text={t('common:text-loading')} />;
+  if (isLoading || loading) return <Loader text={t('common:text-loading')} />;
 
   if (loading) return <Loader text={t('common:text-loading')} />;
   if (error) return <ErrorMessage message={error.message} />;
@@ -102,9 +100,10 @@ export default function TermsAndConditions() {
   // }
 
   if (currentUser === 'vendor') {
-    const isEnableTermsRoute = settings?.options?.enableTerms;
+    // const isEnableTermsRoute = settings?.options?.enableTerms;
+    const isEnableTermsRoute = false;
     const routePermission = isEnableTermsRoute ? adminAndOwnerOnly : adminOnly;
-    const isSuperAdmin = hasAccess(adminOnly, permissions)
+    const isSuperAdmin = hasAccess(adminOnly, permissions);
     const hasPermission = hasAccess(routePermission, permissions);
     const vendorHasShop =
       me?.shops?.map((shop: any) => shop.id).includes(shopId) ?? true;

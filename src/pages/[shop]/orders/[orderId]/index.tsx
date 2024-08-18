@@ -63,7 +63,7 @@ export default function OrderDetailsPage() {
       language: locale!,
       isRTL,
     },
-    { enabled: false }
+    { enabled: false },
   );
 
   const {
@@ -95,27 +95,27 @@ export default function OrderDetailsPage() {
   const { price: subtotal } = usePrice(
     order && {
       amount: order?.amount!,
-    }
+    },
   );
   const { price: total } = usePrice(
     order && {
       amount: order?.paid_total!,
-    }
+    },
   );
   const { price: discount } = usePrice(
     order && {
       amount: order?.discount!,
-    }
+    },
   );
   const { price: delivery_fee } = usePrice(
     order && {
       amount: order?.delivery_fee!,
-    }
+    },
   );
   const { price: sales_tax } = usePrice(
     order && {
       amount: order?.sales_tax!,
-    }
+    },
   );
 
   const phoneNumber = useFormatPhoneNumber({
@@ -170,7 +170,7 @@ export default function OrderDetailsPage() {
 
   if (
     !hasAccess(adminOnly, permissions) &&
-    !me?.shops?.map((shop) => shop.id).includes(shopId) &&
+    // !me?.shops?.map((shop) => shop.id).includes(shopId) &&
     me?.managed_shop?.id != shopId
   ) {
     router.replace(Routes.dashboard);
@@ -213,7 +213,10 @@ export default function OrderDetailsPage() {
                   getOptionLabel={(option: any) => t(option.name)}
                   getOptionValue={(option: any) => option.status}
                   options={ORDER_STATUS.slice(0, 6)}
-                  placeholder={t(`text-${order?.order_status}`) ?? t('form:input-placeholder-order-status')}
+                  placeholder={
+                    t(`text-${order?.order_status}`) ??
+                    t('form:input-placeholder-order-status')
+                  }
                 />
                 <ValidationError message={t(errors?.order_status?.message)} />
               </div>

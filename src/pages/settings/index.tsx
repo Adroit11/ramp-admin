@@ -21,13 +21,13 @@ export default function Settings() {
   const { shippingClasses, loading: shippingLoading } =
     useShippingClassesQuery();
 
-  const { settings, loading, error } = useSettingsQuery({
-    language: locale!,
-  });
+  // const { settings, loading, error } = useSettingsQuery({
+  //   language: locale!,
+  // });
 
-  if (loading || shippingLoading || taxLoading)
-    return <Loader text={t('common:text-loading')} />;
-  if (error) return <ErrorMessage message={error.message} />;
+  // if (loading || shippingLoading || taxLoading)
+  //   return <Loader text={t('common:text-loading')} />;
+  // if (error) return <ErrorMessage message={error.message} />;
 
   return (
     <>

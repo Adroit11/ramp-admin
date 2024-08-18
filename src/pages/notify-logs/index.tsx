@@ -207,7 +207,7 @@ export default function NotifyLogsPage() {
   const [target, setTarget] = useState<string>();
   const [page, setPage] = useState(1);
   const [readStatus, setReadStatus] = useState<string>();
-  const { data, isLoading: loading, error } = useMeQuery();
+  // const { data, isLoading: loading, error } = useMeQuery();
 
   const {
     notifyLogs,
@@ -215,7 +215,7 @@ export default function NotifyLogsPage() {
     paginatorInfo,
     error: errorLogs,
   } = useNotifyLogsQuery({
-    receiver: data?.id,
+    receiver: '',
     notify_type: target,
     language: locale,
     limit: 30,
@@ -225,7 +225,7 @@ export default function NotifyLogsPage() {
   });
 
   if (loadingLogs) return <Loader text={t('common:text-loading')} />;
-  if (error) return <ErrorMessage message={error.message} />;
+  // if (error) return <ErrorMessage message={error.message} />;
 
   return (
     <>

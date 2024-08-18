@@ -36,7 +36,7 @@ export default function VerifyEmailActions() {
   return (
     <>
       <AuthPageLayout>
-        <h3 className="mt-4 mb-6 text-center text-base italic text-red-500 text-body">
+        <h3 className="mt-4 mb-6 text-center text-base italic text-red-500">
           {t('common:email-not-verified')}
         </h3>
         <div className="w-full space-y-3">

@@ -13,17 +13,17 @@ import { useRouter } from 'next/router';
 export default function SeoSettings() {
   const { t } = useTranslation();
   const { locale } = useRouter();
-  const { settings, loading, error } = useSettingsQuery({
-    language: locale! as string,
-  });
+  // const { settings, loading, error } = useSettingsQuery({
+  //   language: locale! as string,
+  // });
 
-  if (loading) return <Loader text={t('common:text-loading')} />;
-  if (error) return <ErrorMessage message={error.message} />;
+  // if (loading) return <Loader text={t('common:text-loading')} />;
+  // if (error) return <ErrorMessage message={error.message} />;
 
   return (
     <>
       <SettingsPageHeader pageTitle="form:form-title-seo-settings" />
-      <SeoSettingsForm settings={settings as Settings} />
+      {/* <SeoSettingsForm settings={settings as Settings} /> */}
     </>
   );
 }
