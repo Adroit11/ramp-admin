@@ -134,7 +134,7 @@ const ReviewDetailsView = ({ review }: IProps) => {
       <div className="mb-10 flex w-full items-start space-x-4 rtl:space-x-reverse md:space-x-5">
         <div className="relative h-20 w-20 shrink-0 border border-gray-200">
           <Image
-            src={image?.thumbnail ?? siteSettings.product.placeholder}
+            src={image ?? siteSettings.product.placeholder}
             alt={String(name)}
             width={75}
             height={75}

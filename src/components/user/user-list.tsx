@@ -46,7 +46,9 @@ const UserList = ({
   const onHeaderClick = (column: any | null) => ({
     onClick: () => {
       onSort((currentSortDirection: SortOrder) =>
-        currentSortDirection === SortOrder.Desc ? SortOrder.Asc : SortOrder.Desc
+        currentSortDirection === SortOrder.Desc
+          ? SortOrder.Asc
+          : SortOrder.Desc,
       );
 
       onOrder(column);
@@ -96,7 +98,7 @@ const UserList = ({
       onHeaderCell: () => onHeaderClick('name'),
       render: (
         name: string,
-        { profile, email }: { profile: any; email: string }
+        { profile, email }: { profile: any; email: string },
       ) => (
         <div className="flex items-center">
           <Avatar name={name} src={profile?.avatar?.thumbnail} />
@@ -126,7 +128,7 @@ const UserList = ({
                 >
                   {name}
                 </span>
-              )
+              ),
             )}
           </div>
         );
@@ -177,7 +179,7 @@ const UserList = ({
         const { data } = useMeQuery();
         return (
           <>
-            {data?.id != id && (
+            {/* {data?.id != id && (
               <ActionButtons
                 id={id}
                 userStatus={true}
@@ -185,7 +187,7 @@ const UserList = ({
                 showAddWalletPoints={true}
                 showMakeAdminButton={true}
               />
-            )}
+            )} */}
           </>
         );
       },

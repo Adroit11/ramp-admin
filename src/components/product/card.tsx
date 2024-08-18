@@ -55,7 +55,7 @@ const ProductCard = ({ item }: Props) => {
       >
         <span className="sr-only">{t('text-product-image')}</span>
         <Image
-          src={image?.original ?? productPlaceholder}
+          src={image ?? productPlaceholder}
           alt={name}
           fill
           sizes="(max-width: 768px) 100vw"
