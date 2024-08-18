@@ -1,4 +1,4 @@
-import CreateOrUpdateFaqsForm from '@/components/faqs/faqs-form';
+// import CreateOrUpdateFaqsForm from '@/components/faqs/faqs-form';
 import Layout from '@/components/layouts/admin';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -13,7 +13,7 @@ export default function CreateFAQsPage() {
           {t('text-non-translated-title')} {t('text-faq')}
         </h1>
       </div>
-      <CreateOrUpdateFaqsForm />
+      {/* <CreateOrUpdateFaqsForm /> */}
     </>
   );
 }

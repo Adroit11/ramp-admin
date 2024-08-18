@@ -1,5 +1,5 @@
 import Layout from '@/components/layouts/admin';
-import StoreNoticeCreateOrUpdateForm from '@/components/store-notice/store-notice-form';
+// import StoreNoticeCreateOrUpdateForm from '@/components/store-notice/store-notice-form';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
@@ -12,7 +12,7 @@ export default function CreateStoreNoticePage() {
           {t('form:form-title-create-store-notice')}
         </h1>
       </div>
-      <StoreNoticeCreateOrUpdateForm />
+      {/* <StoreNoticeCreateOrUpdateForm /> */}
     </>
   );
 }

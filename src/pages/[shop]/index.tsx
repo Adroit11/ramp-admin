@@ -40,7 +40,7 @@ import Alert from '@/components/ui/alert';
 import Link from '@/components/ui/link';
 import { PaymentInfo } from '@/types';
 import { useFormatPhoneNumber } from '@/utils/format-phone-number';
-import { useSettingsQuery } from '@/data/settings';
+// import { useSettingsQuery } from '@/data/settings';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from 'react-query';
 import { getShopDetailsFn } from '@/services/shop';

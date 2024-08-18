@@ -1,4 +1,4 @@
-import CreateOrUpdateFlashSaleForm from '@/components/flash-sale/flash-sale-form';
+// import CreateOrUpdateFlashSaleForm from '@/components/flash-sale/flash-sale-form';
 import Layout from '@/components/layouts/admin';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -12,7 +12,7 @@ export default function CreateFlashSalePage() {
           {t('form:form-title-create-flash-sale')}
         </h1>
       </div>
-      <CreateOrUpdateFlashSaleForm />
+      {/* <CreateOrUpdateFlashSaleForm /> */}
     </>
   );
 }
