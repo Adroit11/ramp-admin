@@ -54,7 +54,7 @@ function SoldProductCard({ product }: { product: Product }) {
       <div className="relative flex justify-center overflow-hidden border shrink-0 rounded-xl border-border-200/60">
         <Image
           alt={name}
-          src={image?.original ?? siteSettings.product.placeholder}
+          src={image ?? siteSettings.product.placeholder}
           width={type?.name !== 'Books' ? 435 : 295}
           height={type?.name !== 'Books' ? 435 : 340}
           priority={true}
