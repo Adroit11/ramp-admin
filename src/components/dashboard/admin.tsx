@@ -196,33 +196,33 @@ export default function Dashboard() {
           </h3>
         </div>
 
-        <div className="grid w-full grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid w-full grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
           <StickerCard
-            titleTransKey="sticker-card-title-rev"
+            titleTransKey="Total Shops"
             subtitleTransKey="sticker-card-subtitle-rev"
             icon={<EaringIcon className="h-8 w-8" />}
             color="#1EAE98"
             price={0}
           />
           <StickerCard
-            titleTransKey="sticker-card-title-order"
+            titleTransKey="Total Products"
             subtitleTransKey="sticker-card-subtitle-order"
             icon={<ShoppingIcon className="h-8 w-8" />}
             color="#865DFF"
             price={0}
           />
           <StickerCard
-            titleTransKey="sticker-card-title-vendor"
+            titleTransKey="Total Orders"
             icon={<ChecklistIcon className="h-8 w-8" />}
             color="#D74EFF"
             price={0}
           />
-          <StickerCard
+          {/* <StickerCard
             titleTransKey="sticker-card-title-total-shops"
             icon={<BasketIcon className="h-8 w-8" />}
             color="#E157A0"
             price={0}
-          />
+          /> */}
         </div>
       </div>
 

@@ -42,7 +42,9 @@ const ShopList = ({
   const onHeaderClick = (column: string | null) => ({
     onClick: () => {
       onSort((currentSortDirection: SortOrder) =>
-        currentSortDirection === SortOrder.Desc ? SortOrder.Asc : SortOrder.Desc
+        currentSortDirection === SortOrder.Desc
+          ? SortOrder.Asc
+          : SortOrder.Desc,
       );
       onOrder(column!);
 
@@ -83,7 +85,7 @@ const ShopList = ({
         <div className="flex items-center">
           <div className="relative aspect-square h-10 w-10 shrink-0 overflow-hidden rounded border border-border-200/80 bg-gray-100 me-2.5">
             <Image
-              src={logo?.thumbnail ?? siteSettings?.product?.placeholder}
+              src={logo ?? siteSettings?.product?.placeholder}
               alt={name}
               fill
               priority={true}
@@ -181,16 +183,16 @@ const ShopList = ({
     },
     {
       title: t('table:table-item-actions'),
-      dataIndex: 'id',
+      dataIndex: 'uid',
       key: 'actions',
       align: alignRight,
       width: 120,
-      render: (id: string, { slug, is_active }: any) => {
+      render: (uid: string, { slug, is_active }: any) => {
         return (
           <ActionButtons
-            id={id}
+            id={uid}
             approveButton={true}
-            detailsUrl={`/${slug}`}
+            detailsUrl={`/${uid}`}
             isShopActive={is_active}
           />
         );

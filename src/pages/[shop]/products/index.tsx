@@ -66,9 +66,10 @@ export default function ProductsPage() {
   const [page, setPage] = useState(1);
   const [orderBy, setOrder] = useState('created_at');
   const [sortedBy, setColumn] = useState<SortOrder>(SortOrder.Desc);
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(false);
   const { openModal } = useModalAction();
   const { locale } = useRouter();
+  const [searchValue, setSearchValue] = useState('');
 
   const toggleVisible = () => {
     setVisible((v) => !v);
@@ -103,7 +104,6 @@ export default function ProductsPage() {
     return null;
   }, [getShopQuery.isLoading, getShopQuery.data]);
 
-  // ADD GET PRODUCT AND ADD A TYPE
   const getShopProductsQuery = useQuery(
     ['get_shop_products', shop?.toString()],
     () => {
@@ -113,18 +113,29 @@ export default function ProductsPage() {
 
   const shopProductsData = useMemo(() => {
     if (getShopProductsQuery.data?.data) {
+      if (searchTerm) {
+        return (
+          getShopProductsQuery.data.data as GetShopProductTypeForOwner[]
+        )?.filter((prd) =>
+          prd.name.toLowerCase().includes(searchTerm.toLowerCase()),
+        );
+      }
       return getShopProductsQuery.data.data as GetShopProductTypeForOwner[];
     }
-    return [];
-  }, [getShopProductsQuery.isLoading, getShopProductsQuery.data]);
+    return null;
+  }, [getShopProductsQuery.isLoading, getShopProductsQuery.data, searchTerm]);
+  // console.log('xxxxxx', shopProductsData, shop);
 
   function handleImportModal() {
     openModal('EXPORT_IMPORT_PRODUCT', shopData?.uid);
   }
 
-  if (getShopQuery.isLoading) return <Loader text={t('common:text-loading')} />;
-  if (getShopQuery.isError)
-    return <ErrorMessage message={getErrorMessage(getShopQuery.error)} />;
+  if (getShopProductsQuery.isLoading)
+    return <Loader text={t('common:text-loading')} />;
+  if (getShopProductsQuery.isError)
+    return (
+      <ErrorMessage message={getErrorMessage(getShopProductsQuery.error)} />
+    );
 
   function handleSearch({ searchText }: { searchText: string }) {
     setSearchTerm(searchText);
@@ -175,7 +186,7 @@ export default function ProductsPage() {
               {t('common:text-export-import')}
             </Button>
 
-            <button
+            {/* <button
               className="mt-5 flex items-center whitespace-nowrap text-base font-semibold text-accent md:mt-0 md:ms-5"
               onClick={toggleVisible}
             >
@@ -185,14 +196,14 @@ export default function ProductsPage() {
               ) : (
                 <ArrowDown className="ms-2" />
               )}
-            </button>
+            </button> */}
 
-            <button
+            {/* <button
               onClick={handleImportModal}
               className="hidden h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gray-50 transition duration-300 ms-5 hover:bg-gray-100 md:flex"
             >
               <MoreIcon className="w-3.5 text-body" />
-            </button>
+            </button> */}
           </div>
         </div>
 
@@ -226,7 +237,7 @@ export default function ProductsPage() {
         </div>
       </Card>
       <ProductList
-        products={shopProductsData}
+        products={shopProductsData ?? []}
         // paginatorInfo={paginatorInfo}
         paginatorInfo={null}
         onPagination={handlePagination}

@@ -29,9 +29,16 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useFormatPhoneNumber } from '@/utils/format-phone-number';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { getUserAuthData } from '@/utils/auth-utils';
+import { useAuth } from '@/hooks/useAuth';
+import { getOrderDetailFn, updateOrderDetailFn } from '@/services/orders';
+import { OrderType } from '@/types/orders';
+import { toast } from 'react-toastify';
+import { convertShopAddres, getErrorMessage } from '@/utils/helpers';
 
 type FormValues = {
   order_status: any;
@@ -40,29 +47,58 @@ export default function OrderDetailsPage() {
   const { t } = useTranslation();
   const { query, locale } = useRouter();
   const { alignLeft, alignRight, isRTL } = useIsRTL();
-  const { resetCart } = useCart();
-  const [, resetCheckout] = useAtom(clearCheckoutAtom);
+  // const { resetCart } = useCart();
+  // const [, resetCheckout] = useAtom(clearCheckoutAtom);
 
-  useEffect(() => {
-    resetCart();
-    // @ts-ignore
-    resetCheckout();
-  }, [resetCart, resetCheckout]);
+  // useEffect(() => {
+  //   resetCart();
+  //   // @ts-ignore
+  //   resetCheckout();
+  // }, [resetCart, resetCheckout]);
 
-  const { mutate: updateOrder, isLoading: updating } = useUpdateOrderMutation();
-  const {
-    order,
-    isLoading: loading,
-    error,
-  } = useOrderQuery({ id: query.orderId as string, language: locale! });
-  const { refetch } = useDownloadInvoiceMutation(
-    {
-      order_id: query.orderId as string,
-      isRTL,
-      language: locale!,
+  // const { mutate: updateOrder, isLoading: updating } = useUpdateOrderMutation();
+  // const {
+  //   order,
+  //   isLoading: loading,
+  //   error,
+  // } = useOrderQuery({ id: query.orderId as string, language: locale! });
+  // const { refetch } = useDownloadInvoiceMutation(
+  //   {
+  //     order_id: query.orderId as string,
+  //     isRTL,
+  //     language: locale!,
+  //   },
+  //   { enabled: false }
+  // );
+
+  const queryClient = useQueryClient();
+  const userAuthData = getUserAuthData();
+  const { user, isLoading } = useAuth();
+
+  const orderQuery = useQuery(['get_order_detail', query.orderId], () => {
+    return getOrderDetailFn(query.orderId as string);
+  });
+
+  const orderDetail = useMemo(() => {
+    if (orderQuery.data?.data) {
+      return orderQuery.data.data as OrderType;
+    }
+
+    return null;
+  }, [orderQuery.isLoading, orderQuery.data]);
+
+  const updateOrder = useMutation({
+    mutationFn: updateOrderDetailFn,
+    onSuccess: () => {
+      toast.success('Update Successful');
     },
-    { enabled: false }
-  );
+    onError: (err) => {
+      toast.error(getErrorMessage(err));
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries('get_order_detail');
+    },
+  });
 
   const {
     handleSubmit,
@@ -70,79 +106,81 @@ export default function OrderDetailsPage() {
 
     formState: { errors },
   } = useForm<FormValues>({
-    defaultValues: { order_status: order?.order_status ?? '' },
+    defaultValues: { order_status: orderDetail?.order_status ?? '' },
   });
 
   const ChangeStatus = ({ order_status }: FormValues) => {
-    updateOrder({
-      id: order?.id as string,
+    updateOrder.mutate({
+      uid: orderDetail?.uid ?? '',
       order_status: order_status?.status as string,
     });
   };
   const { price: subtotal } = usePrice(
-    order && {
-      amount: order?.amount!,
-    }
+    orderDetail && {
+      amount: orderDetail?.amount!,
+    },
+  );
+  const { price: total } = usePrice(
+    orderDetail && {
+      amount: orderDetail?.total,
+    },
   );
 
-  const { price: total } = usePrice(
-    order && {
-      amount: order?.paid_total!,
-    }
-  );
-  const { price: discount } = usePrice(
-    order && {
-      amount: order?.discount! ?? 0,
-    }
-  );
-  const { price: delivery_fee } = usePrice(
-    order && {
-      amount: order?.delivery_fee!,
-    }
-  );
-  const { price: sales_tax } = usePrice(
-    order && {
-      amount: order?.sales_tax!,
-    }
-  );
-  const { price: sub_total } = usePrice({ amount: order?.amount! });
-  const { price: shipping_charge } = usePrice({
-    amount: order?.delivery_fee ?? 0,
-  });
-  const { price: wallet_total } = usePrice({
-    amount: order?.wallet_point?.amount!,
-  });
+  // const { price: discount } = usePrice(
+  //   order && {
+  //     amount: order?.discount! ?? 0,
+  //   }
+  // );
+  // const { price: delivery_fee } = usePrice(
+  //   order && {
+  //     amount: order?.delivery_fee!,
+  //   }
+  // );
+  // const { price: sales_tax } = usePrice(
+  //   order && {
+  //     amount: order?.sales_tax!,
+  //   }
+  // );
+  // const { price: sub_total } = usePrice({ amount: order?.amount! });
+  // const { price: shipping_charge } = usePrice({
+  //   amount: order?.delivery_fee ?? 0,
+  // });
+  // const { price: wallet_total } = usePrice({
+  //   amount: order?.wallet_point?.amount!,
+  // });
 
   const amountPayable: number =
-    order?.payment_status !== PaymentStatus.SUCCESS
-      ? order?.paid_total! - order?.wallet_point?.amount!
+    orderDetail?.payment_status !== PaymentStatus.SUCCESS
+      ? orderDetail?.total!
       : 0;
 
   const { price: amountDue } = usePrice({ amount: amountPayable });
 
-  const totalItem = order?.products.reduce(
+  const totalItem = orderDetail?.products.reduce(
     // @ts-ignore
     (initial = 0, p) => initial + parseInt(p?.pivot?.order_quantity!),
-    0
+    0,
   );
 
-  const phoneNumber = useFormatPhoneNumber({
-    customer_contact: order?.customer_contact as string,
-  });
+  // const phoneNumber = useFormatPhoneNumber({
+  //   customer_contact: order?.customer_contact as string,
+  // });
 
-  if (loading) return <Loader text={t('common:text-loading')} />;
-  if (error) return <ErrorMessage message={error.message} />;
+  if (orderQuery.isLoading || isLoading)
+    return <Loader text={t('common:text-loading')} />;
+  if (orderQuery.isError)
+    return <ErrorMessage message={getErrorMessage(orderQuery.error)} />;
 
-  async function handleDownloadInvoice() {
-    const { data } = await refetch();
+  // async function handleDownloadInvoice() {
+  //   const { data } = await refetch();
 
-    if (data) {
-      const a = document.createElement('a');
-      a.href = data;
-      a.setAttribute('download', 'order-invoice');
-      a.click();
-    }
-  }
+  //   if (data) {
+  //     const a = document.createElement('a');
+  //     a.href = data;
+  //     a.setAttribute('download', 'order-invoice');
+  //     a.click();
+  //   }
+  // }
 
   const columns = [
     {
@@ -166,13 +204,11 @@ export default function OrderDetailsPage() {
       dataIndex: 'name',
       key: 'name',
       align: alignLeft,
-      render: (name: string, item: any) => (
+      render: (name: string, item: OrderType) => (
         <div>
           <span>{name}</span>
           <span className="mx-2">x</span>
-          <span className="font-semibold text-heading">
-            {item.pivot.order_quantity}
-          </span>
+          <span className="font-semibold text-heading">{item.quantity}</span>
         </div>
       ),
     },
@@ -183,7 +219,7 @@ export default function OrderDetailsPage() {
       align: alignRight,
       render: function Render(_: any, item: any) {
         const { price } = usePrice({
-          amount: parseFloat(item.pivot.subtotal),
+          amount: item.price,
         });
         return <span>{price}</span>;
       },
@@ -196,9 +232,9 @@ export default function OrderDetailsPage() {
     <>
       <Card className="relative overflow-hidden">
         <div className="mb-6 -mt-5 -ml-5 -mr-5 md:-mr-8 md:-ml-8 md:-mt-8">
-          <OrderViewHeader order={order} wrapperClassName="px-8 py-4" />
+          <OrderViewHeader order={orderDetail} wrapperClassName="px-8 py-4" />
         </div>
-        <div className="flex w-full">
+        {/* <div className="flex w-full">
           <Button
             onClick={handleDownloadInvoice}
             className="mb-5 bg-blue-500 ltr:ml-auto rtl:mr-auto"
@@ -206,17 +242,17 @@ export default function OrderDetailsPage() {
             <DownloadIcon className="h-4 w-4 me-3" />
             {t('common:text-download')} {t('common:text-invoice')}
           </Button>
-        </div>
+        </div> */}
 
         <div className="flex flex-col items-center lg:flex-row">
           <h3 className="mb-8 w-full whitespace-nowrap text-center text-2xl font-semibold text-heading lg:mb-0 lg:w-1/3 lg:text-start">
-            {t('form:input-label-order-id')} - {order?.tracking_number}
+            {t('form:input-label-order-id')} - {orderDetail?.tracking_number}
           </h3>
           {![
             OrderStatus.FAILED,
             OrderStatus.CANCELLED,
             OrderStatus.REFUNDED,
-          ].includes(order?.order_status! as OrderStatus) && (
+          ].includes(orderDetail?.order_status! as OrderStatus) && (
             <form
               onSubmit={handleSubmit(ChangeStatus)}
               className="flex w-full items-start ms-auto lg:w-2/4"
@@ -228,12 +264,15 @@ export default function OrderDetailsPage() {
                   getOptionLabel={(option: any) => t(option.name)}
                   getOptionValue={(option: any) => option.status}
                   options={ORDER_STATUS.slice(0, 6)}
-                  placeholder={t(`text-${order?.order_status}`) ?? t('form:input-placeholder-order-status')}
+                  placeholder={
+                    t(`text-${orderDetail?.order_status}`) ??
+                    t('form:input-placeholder-order-status')
+                  }
                 />
 
                 <ValidationError message={t(errors?.order_status?.message)} />
               </div>
-              <Button loading={updating}>
+              <Button loading={updateOrder.isLoading}>
                 <span className="hidden sm:block">
                   {t('form:button-label-change-status')}
                 </span>
@@ -247,13 +286,13 @@ export default function OrderDetailsPage() {
 
         <div className="my-5 flex items-center justify-center lg:my-10">
           <OrderStatusProgressBox
-            orderStatus={order?.order_status as OrderStatus}
-            paymentStatus={order?.payment_status as PaymentStatus}
+            orderStatus={orderDetail?.order_status as OrderStatus}
+            paymentStatus={orderDetail?.payment_status as PaymentStatus}
           />
         </div>
 
         <div className="mb-10">
-          {order ? (
+          {orderDetail ? (
             <Table
               //@ts-ignore
               columns={columns}
@@ -268,7 +307,8 @@ export default function OrderDetailsPage() {
                   </p>
                 </div>
               )}
-              data={order?.products!}
+              // @ts-ignore
+              data={orderDetail?.products ?? []}
               rowKey="id"
               scroll={{ x: 300 }}
             />
@@ -276,7 +316,7 @@ export default function OrderDetailsPage() {
             <span>{t('common:no-order-found')}</span>
           )}
 
-          {order?.parent_id! ? (
+          {orderDetail?.uid! ? (
             <div className="flex w-full flex-col space-y-2 border-t-4 border-double border-border-200 px-4 py-4 ms-auto sm:w-1/2 md:w-1/3">
               <div className="flex items-center justify-between text-sm text-body">
                 <span>{t('common:order-sub-total')}</span>
@@ -292,9 +332,9 @@ export default function OrderDetailsPage() {
               <div className="flex w-full flex-col space-y-2 border-t-4 border-double border-border-200 px-4 py-4 ms-auto sm:w-1/2 md:w-1/3">
                 <div className="flex items-center justify-between text-sm text-body">
                   <span>{t('common:order-sub-total')}</span>
-                  <span>{sub_total}</span>
+                  <span>{subtotal}</span>
                 </div>
-                <div className="flex items-center justify-between text-sm text-body">
+                {/* <div className="flex items-center justify-between text-sm text-body">
                   <span> {t('text-shipping-charge')}</span>
                   <span>{shipping_charge}</span>
                 </div>
@@ -307,14 +347,14 @@ export default function OrderDetailsPage() {
                     <span>{t('text-discount')}</span>
                     <span>{discount}</span>
                   </div>
-                )}
+                )} */}
 
                 <div className="flex items-center justify-between text-base font-semibold text-heading">
                   <span> {t('text-total')}</span>
                   <span>{total}</span>
                 </div>
 
-                {order?.wallet_point?.amount! && (
+                {/* {order?.wallet_point?.amount! && (
                   <>
                     <div className="flex items-center justify-between text-sm text-body">
                       <span> {t('text-paid-from-wallet')}</span>
@@ -325,19 +365,19 @@ export default function OrderDetailsPage() {
                       <span>{amountDue}</span>
                     </div>
                   </>
-                )}
+                )} */}
               </div>
             </>
           )}
         </div>
 
-        {order?.note ? (
+        {orderDetail?.note ? (
           <div>
             <h2 className="mt-12 mb-5 text-xl font-bold text-heading">
               Purchase Note
             </h2>
             <div className="mb-12 flex items-start rounded border border-gray-700 bg-gray-100 p-4">
-              {order?.note}
+              {orderDetail?.note}
             </div>
           </div>
         ) : (
@@ -352,12 +392,12 @@ export default function OrderDetailsPage() {
 
             <div className="flex flex-col items-start space-y-1 text-sm text-body">
               <span>
-                {formatString(order?.products?.length, t('text-item'))}
+                {formatString(orderDetail?.products?.length, t('text-item'))}
               </span>
-              <span>{order?.delivery_time}</span>
-              <span>
-                {`${t('text-payment-method')}:  ${order?.payment_gateway}`}
-              </span>
+              {/* <span>{orderDetail?.delivery_time}</span> */}
+              {/* <span>
+                {`${t('text-payment-method')}:  ${orderDetail?.payment_gateway}`}
+              </span> */}
             </div>
           </div>
 
@@ -367,26 +407,27 @@ export default function OrderDetailsPage() {
             </h3>
 
             <div className="flex flex-col items-start space-y-1 text-sm text-body">
-              <span>{order?.customer_name}</span>
-              {order?.billing_address && (
-                <span>{formatAddress(order.billing_address)}</span>
+              {/* @ts-ignore */}
+              <span>{orderDetail?.customer?.name ?? ''}</span>
+              {orderDetail?.billing_address && (
+                <span>{convertShopAddres(orderDetail.billing_address)}</span>
               )}
-              {order?.customer_contact && <span>{phoneNumber}</span>}
+              {/* {orderDetail?.customer_contact && <span>{phoneNumber}</span>} */}
             </div>
           </div>
 
-          <div className="w-full sm:w-1/2 sm:ps-8">
+          <div className="w-full  sm:ps-8">
             <h3 className="mb-3 border-b border-border-200 pb-2 font-semibold text-heading text-start sm:text-end">
               {t('common:shipping-address')}
             </h3>
 
-            <div className="flex flex-col items-start space-y-1 text-sm text-body text-start sm:items-end sm:text-end">
-              <span>{order?.customer_name}</span>
-              {order?.shipping_address && (
-                <span>{formatAddress(order.shipping_address)}</span>
-              )}
+            {/* <div className="flex flex-col items-start space-y-1 text-sm text-body text-start sm:items-end sm:text-end">
+              {/* <span>{orderDetail?.customer_name}</span> */}
+            {/* {orderDetail?.shipping_address && (
+                <span>{convertShopAddres(orderDetail.shipping_address ?? '')}</span>
+              )} 
               {order?.customer_contact && <span>{phoneNumber}</span>}
-            </div>
+            </div> */}
           </div>
         </div>
       </Card>

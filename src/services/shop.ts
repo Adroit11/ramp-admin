@@ -96,6 +96,28 @@ export const getShopDetailsFn = async (uid: string) => {
   }
 };
 
+export const approveShopForadmin = async (uid: string) => {
+  try {
+    const res = await request.post('/shop/update', { uid, status: 'approve' });
+
+    return res.data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+};
+export const revokeShopApprovalForadmin = async (uid: string) => {
+  try {
+    const res = await request.post('/shop/update', {
+      uid,
+      status: 'disapprove',
+    });
+
+    return res.data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+};
+
 // products
 
 export const getShopProductsFn = async (uid: string) => {
@@ -114,11 +136,11 @@ export interface CreateShopProductDataType {
   description: string;
   price: string;
   quantity: string;
-  cover_image: File;
+  // cover_image: File;
   image: File;
 }
 export interface EditShopProductDataType {
-  uid: string; // product uid
+  uid?: string; // product uid
   description: string;
   price: number;
   quantity: number;
@@ -137,7 +159,7 @@ export const createShopProductFn = async (data: CreateShopProductDataType) => {
     newData.append('price', data.price);
     newData.append('quantity', data.quantity);
     newData.append('image', data.image);
-    newData.append('cover_image', data.cover_image);
+    // newData.append('cover_image', data.cover_image);
 
     const res = await request.post('/shop/product', newData, {
       headers: {
@@ -153,7 +175,27 @@ export const createShopProductFn = async (data: CreateShopProductDataType) => {
 
 export const editShopProductFn = async (data: EditShopProductDataType) => {
   try {
-    const res = await request.post('/shop/product', data);
+    const res = await request.post('/shop/product/update', data);
+
+    return res.data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+};
+
+export const getShopProductFn = async (uid: string) => {
+  try {
+    const res = await request.post('/shop/product/details', { uid });
+
+    return res.data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+};
+
+export const deleteShopProductFn = async (uid: string) => {
+  try {
+    const res = await request.post('/shop/product/delete', { uid });
 
     return res.data;
   } catch (error) {

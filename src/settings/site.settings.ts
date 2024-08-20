@@ -130,11 +130,11 @@ export const siteSettings = {
                 label: 'text-add-all-shops',
                 icon: 'ShopIcon',
               },
-              {
-                href: Routes.newShops,
-                label: 'text-inactive-shops',
-                icon: 'MyShopIcon',
-              },
+              // {
+              //   href: Routes.newShops,
+              //   label: 'text-inactive-shops',
+              //   icon: 'MyShopIcon',
+              // },
             ],
           },
           {
@@ -145,75 +145,75 @@ export const siteSettings = {
         ],
       },
 
-      product: {
-        href: '',
-        label: 'text-product-management',
-        icon: 'ProductsIcon',
-        childMenu: [
-          {
-            href: '',
-            label: 'sidebar-nav-item-products',
-            icon: 'ProductsIcon',
-            childMenu: [
-              {
-                href: Routes.product.list,
-                label: 'text-all-products',
-                icon: 'ProductsIcon',
-              },
-              // {
-              //   href: Routes.product.create,
-              //   label: 'Add new product',
-              //   icon: 'ProductsIcon',
-              // },
-              // {
-              //   href: Routes.draftProducts,
-              //   label: 'text-my-draft-products',
-              //   icon: 'ProductsIcon',
-              // },
-              // {
-              //   href: Routes.outOfStockOrLowProducts,
-              //   label: 'text-all-out-of-stock',
-              //   icon: 'ProductsIcon',
-              // },
-            ],
-          },
-          // {
-          //   href: Routes.type.list,
-          //   label: 'text-groups',
-          //   icon: 'HomeIcon',
-          // },
-          // {
-          //   href: Routes.productInventory,
-          //   label: 'text-inventory',
-          //   icon: 'InventoryIcon',
-          // },
-          // {
-          //   href: Routes.category.list,
-          //   label: 'sidebar-nav-item-categories',
-          //   icon: 'CategoriesIcon',
-          // },
-          // {
-          //   href: Routes.tag.list,
-          //   label: 'sidebar-nav-item-tags',
-          //   icon: 'TagIcon',
-          // },
-          // {
-          //   href: Routes.attribute.list,
-          //   label: 'sidebar-nav-item-attributes',
-          //   icon: 'AttributeIcon',
-          // },
-          // {
-          //   href: Routes.manufacturer.list,
-          //   label: 'sidebar-nav-item-manufacturers',
-          //   icon: 'ManufacturersIcon',
-          // },
-          // {
-          //   href: Routes.author.list,
-          //   label: 'sidebar-nav-item-authors',
-          //   icon: 'AuthorIcon',
-          // },
-        ],
-      },
+      // product: {
+      //   href: '',
+      //   label: 'text-product-management',
+      //   icon: 'ProductsIcon',
+      //   childMenu: [
+      //     {
+      //       href: '',
+      //       label: 'sidebar-nav-item-products',
+      //       icon: 'ProductsIcon',
+      //       childMenu: [
+      //         {
+      //           href: Routes.product.list,
+      //           label: 'text-all-products',
+      //           icon: 'ProductsIcon',
+      //         },
+      //         // {
+      //         //   href: Routes.product.create,
+      //         //   label: 'Add new product',
+      //         //   icon: 'ProductsIcon',
+      //         // },
+      //         // {
+      //         //   href: Routes.draftProducts,
+      //         //   label: 'text-my-draft-products',
+      //         //   icon: 'ProductsIcon',
+      //         // },
+      //         // {
+      //         //   href: Routes.outOfStockOrLowProducts,
+      //         //   label: 'text-all-out-of-stock',
+      //         //   icon: 'ProductsIcon',
+      //         // },
+      //       ],
+      //     },
+      //     // {
+      //     //   href: Routes.type.list,
+      //     //   label: 'text-groups',
+      //     //   icon: 'HomeIcon',
+      //     // },
+      //     // {
+      //     //   href: Routes.productInventory,
+      //     //   label: 'text-inventory',
+      //     //   icon: 'InventoryIcon',
+      //     // },
+      //     // {
+      //     //   href: Routes.category.list,
+      //     //   label: 'sidebar-nav-item-categories',
+      //     //   icon: 'CategoriesIcon',
+      //     // },
+      //     // {
+      //     //   href: Routes.tag.list,
+      //     //   label: 'sidebar-nav-item-tags',
+      //     //   icon: 'TagIcon',
+      //     // },
+      //     // {
+      //     //   href: Routes.attribute.list,
+      //     //   label: 'sidebar-nav-item-attributes',
+      //     //   icon: 'AttributeIcon',
+      //     // },
+      //     // {
+      //     //   href: Routes.manufacturer.list,
+      //     //   label: 'sidebar-nav-item-manufacturers',
+      //     //   icon: 'ManufacturersIcon',
+      //     // },
+      //     // {
+      //     //   href: Routes.author.list,
+      //     //   label: 'sidebar-nav-item-authors',
+      //     //   icon: 'AuthorIcon',
+      //     // },
+      //   ],
+      // },
 
       // financial: {
       //   href: '',
@@ -327,11 +327,11 @@ export const siteSettings = {
           //   label: 'sidebar-nav-item-create-order',
           //   icon: 'CreateOrderIcon',
           // },
-          {
-            href: Routes.transaction,
-            label: 'text-transactions',
-            icon: 'TransactionsIcon',
-          },
+          // {
+          //   href: Routes.transaction,
+          //   label: 'text-transactions',
+          //   icon: 'TransactionsIcon',
+          // },
           // {
           //   href: '',
           //   label: 'Order tracking',
@@ -706,12 +706,12 @@ export const siteSettings = {
             icon: 'OrdersIcon',
             permissions: adminOwnerAndStaffOnly,
           },
-          {
-            href: (shop: string) => `/${shop}${Routes.transaction}`,
-            label: 'text-transactions',
-            icon: 'CalendarScheduleIcon',
-            permissions: adminAndOwnerOnly,
-          },
+          // {
+          //   href: (shop: string) => `/${shop}${Routes.transaction}`,
+          //   label: 'text-transactions',
+          //   icon: 'CalendarScheduleIcon',
+          //   permissions: adminAndOwnerOnly,
+          // },
         ],
       },
 

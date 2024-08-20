@@ -28,7 +28,7 @@ export default function CreateProductPage() {
   // const { permissions } = getAuthCredentials();
   // const { data: me } = useMeQuery();
   const userAuthData = getUserAuthData();
-  const { user, isLoading } = useAuth();
+  // const { user, isLoading } = useAuth();
   // const { data: shopData } = useShopQuery({
   //   slug: shop as string,
   // });
@@ -37,16 +37,16 @@ export default function CreateProductPage() {
     router.replace(Routes.dashboard);
   }
 
-  const getShopQuery = useQuery(['get_shop_detail', shop?.toString()], () => {
-    return getShopDetailsFn(shop?.toString() ?? '');
-  });
+  // const getShopQuery = useQuery(['get_shop_detail', shop?.toString()], () => {
+  //   return getShopDetailsFn(shop?.toString() ?? '');
+  // });
 
-  const shopData = useMemo(() => {
-    if (getShopQuery.data?.data) {
-      return getShopQuery.data.data as GetShopDetailsTypeForOwner;
-    }
-    return null;
-  }, [getShopQuery.isLoading, getShopQuery.data]);
+  // const shopData = useMemo(() => {
+  //   if (getShopQuery.data?.data) {
+  //     return getShopQuery.data.data as GetShopDetailsTypeForOwner;
+  //   }
+  //   return null;
+  // }, [getShopQuery.isLoading, getShopQuery.data]);
 
   return (
     <>

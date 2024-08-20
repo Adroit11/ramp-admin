@@ -260,24 +260,26 @@ const ProductList = ({
         </div>
       ),
     },
-    // {
-    //   title: t('table:table-item-actions'),
-    //   dataIndex: 'slug',
-    //   key: 'actions',
-    //   align: 'right',
-    //   width: 120,
-    //   render: (slug: string, record: Product) => (
-    //     <LanguageSwitcher
-    //       slug={slug}
-    //       record={record}
-    //       deleteModalView="DELETE_PRODUCT"
-    //       routes={Routes?.product}
-    //       enablePreviewMode={true}
-    //       isShop={Boolean(shop)}
-    //       shopSlug={(shop as string) ?? ''}
-    //     />
-    //   ),
-    // },
+    {
+      title: t('table:table-item-actions'),
+      dataIndex: 'uid',
+      key: 'actions',
+      align: 'right',
+      width: 120,
+      render: (uid: string, record: Product) => (
+        <LanguageSwitcher
+          slug={uid}
+          record={record}
+          deleteModalView="DELETE_PRODUCT"
+          routes={Routes?.product}
+          enablePreviewMode={true}
+          isShop={Boolean(shop)}
+          shopSlug={(shop as string) ?? ''}
+          approveProductIsActive={record.status === 'publish'}
+          approveProduct
+        />
+      ),
+    },
   ];
 
   if (router?.query?.shop) {

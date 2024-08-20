@@ -13,6 +13,8 @@ export type LanguageSwitcherProps = {
   enablePreviewMode?: boolean;
   isShop?: boolean;
   shopSlug?: string;
+  approveProduct?: boolean;
+  approveProductIsActive?: boolean;
 };
 
 export default function LanguageSwitcher({
@@ -24,6 +26,8 @@ export default function LanguageSwitcher({
   enablePreviewMode,
   isShop,
   shopSlug,
+  approveProduct,
+  approveProductIsActive,
 }: LanguageSwitcherProps) {
   const { enableMultiLang } = Config;
   const {
@@ -47,11 +51,13 @@ export default function LanguageSwitcher({
         />
       ) : (
         <ActionButtons
-          id={record?.id}
+          id={record?.uid}
           editUrl={routes.editWithoutLang(slug, shop)}
           previewUrl={preview}
-          enablePreviewMode={enablePreviewMode}
+          enablePreviewMode={false}
           deleteModalView={deleteModalView}
+          approveProduct={approveProduct}
+          isProductActive={approveProductIsActive}
         />
       )}
     </>

@@ -205,13 +205,13 @@ export default function CreateOrUpdateProductForm({
     // };
     try {
       if (!initialValues) {
-        if (!values.gallery || !values.image) {
+        if (!values.image) {
           toast.error('All fields are required');
           return;
         }
 
         createShopProduct.mutate({
-          cover_image: values.gallery as File,
+          // cover_image: values.gallery as File,
           image: values.image!,
           description: values.description!,
           name: values.name,
@@ -226,6 +226,7 @@ export default function CreateOrUpdateProductForm({
         };
         updateShopProduct.mutate({
           uid: initialValues.uid,
+          name: values.name ?? initialValues.name,
           description: values.description ?? initialValues.description!,
           price: values.price ?? initialValues.price!,
           quantity: values.quantity ?? initialValues.quantity!,
@@ -375,7 +376,7 @@ export default function CreateOrUpdateProductForm({
       <span className="font-bold">{5} MB </span>
     </span>
   );
-
+  // console.log('we haveeee', initialValues);
   return (
     <>
       {errorMessage ? (
@@ -391,7 +392,7 @@ export default function CreateOrUpdateProductForm({
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
             <Description
-              title={t('form:featured-image-title')}
+              title={t('Product Image')}
               details={featuredImageInformation}
               className="w-full px-0 pb-5 sm:w-4/12 sm:py-8 sm:pe-4 md:w-1/3 md:pe-5"
             />
@@ -412,7 +413,7 @@ export default function CreateOrUpdateProductForm({
             </Card>
           </div>
 
-          <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
+          {/* <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
             <Description
               title={t('form:gallery-title')}
               details={galleryImageInformation}
@@ -427,7 +428,7 @@ export default function CreateOrUpdateProductForm({
                 disabled={!!initialValues}
               />
             </Card>
-          </div>
+          </div> */}
 
           {/* <div className="my-5 flex flex-wrap border-b border-dashed border-border-base pb-8 sm:my-8">
             <Description

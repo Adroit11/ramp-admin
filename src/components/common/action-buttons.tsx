@@ -30,6 +30,8 @@ type Props = {
   showReplyQuestion?: boolean;
   customLocale?: string;
   isTermsApproved?: boolean;
+  approveProduct?: boolean;
+  isProductActive?: boolean;
 };
 
 const ActionButtons = ({
@@ -43,6 +45,7 @@ const ActionButtons = ({
   userStatus = false,
   isUserActive = false,
   isShopActive,
+  isProductActive,
   approveButton = false,
   termApproveButton = false,
   showAddWalletPoints = false,
@@ -51,6 +54,7 @@ const ActionButtons = ({
   showReplyQuestion = false,
   customLocale,
   isTermsApproved,
+  approveProduct,
 }: Props) => {
   const { t } = useTranslation();
   const { openModal } = useModalAction();
@@ -84,6 +88,13 @@ const ActionButtons = ({
       openModal('SHOP_APPROVE_VIEW', id);
     } else {
       openModal('SHOP_DISAPPROVE_VIEW', id);
+    }
+  }
+  function handleProductStatus(status: boolean) {
+    if (status === true) {
+      openModal('PRODUCT_APPROVE_VIEW', id);
+    } else {
+      openModal('PRODUCT_DISAPPROVE_VIEW', id);
     }
   }
 
@@ -159,6 +170,24 @@ const ActionButtons = ({
         ) : (
           <button
             onClick={() => handleShopStatus(false)}
+            className="text-red-500 transition duration-200 hover:text-red-600 focus:outline-none"
+            title={t('common:text-disapprove-shop')}
+          >
+            <CloseFillIcon width={16} />
+          </button>
+        ))}
+      {approveProduct &&
+        (!isProductActive ? (
+          <button
+            onClick={() => handleProductStatus(true)}
+            className="text-accent transition duration-200 hover:text-accent-hover focus:outline-none"
+            title={t('common:text-approve-shop')}
+          >
+            <CheckMarkCircle width={16} />
+          </button>
+        ) : (
+          <button
+            onClick={() => handleProductStatus(false)}
             className="text-red-500 transition duration-200 hover:text-red-600 focus:outline-none"
             title={t('common:text-disapprove-shop')}
           >

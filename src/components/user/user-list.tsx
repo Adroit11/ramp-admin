@@ -18,17 +18,21 @@ import TitleWithSort from '@/components/ui/title-with-sort';
 import { NoDataFound } from '@/components/icons/no-data-found';
 import Avatar from '@/components/common/avatar';
 import Badge from '@/components/ui/badge/badge';
+import { StoreOwnerDataType } from '@/types/users';
 
 type IProps = {
-  customers: User[] | undefined;
+  customers: StoreOwnerDataType[];
   paginatorInfo: MappedPaginatorInfo | null;
   onPagination: (current: number) => void;
   onSort: (current: any) => void;
   onOrder: (current: string) => void;
+
+  hideActions?: boolean;
 };
 const UserList = ({
   customers,
   paginatorInfo,
+  hideActions,
   onPagination,
   onSort,
   onOrder,
@@ -134,13 +138,13 @@ const UserList = ({
         );
       },
     },
-    {
-      title: t('table:table-item-available_wallet_points'),
-      dataIndex: ['wallet', 'available_points'],
-      key: 'available_wallet_points',
-      align: 'center',
-      width: 150,
-    },
+    // {
+    //   title: t('table:table-item-available_wallet_points'),
+    //   dataIndex: ['wallet', 'available_points'],
+    //   key: 'available_wallet_points',
+    //   align: 'center',
+    //   width: 150,
+    // },
     {
       title: (
         <TitleWithSort
@@ -179,15 +183,19 @@ const UserList = ({
         const { data } = useMeQuery();
         return (
           <>
-            {/* {data?.id != id && (
-              <ActionButtons
-                id={id}
-                userStatus={true}
-                isUserActive={is_active}
-                showAddWalletPoints={true}
-                showMakeAdminButton={true}
-              />
-            )} */}
+            {!hideActions ? (
+              <>
+                {data?.id != id && (
+                  <ActionButtons
+                    id={id}
+                    userStatus={false}
+                    isUserActive={is_active}
+                    showAddWalletPoints={false}
+                    showMakeAdminButton={true}
+                  />
+                )}
+              </>
+            ) : null}
           </>
         );
       },

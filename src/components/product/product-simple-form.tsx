@@ -50,7 +50,9 @@ export default function ProductSimpleForm({ initialValues }: IProps) {
           error={t(errors.price?.message!)}
           variant="outline"
           className="mb-5"
-          defaultValue={initialValues?.price}
+          defaultValue={
+            initialValues?.price ? parseFloat(initialValues.price) : undefined
+          }
           required
         />
         {/* <Input
@@ -72,7 +74,11 @@ export default function ProductSimpleForm({ initialValues }: IProps) {
           error={t(errors.quantity?.message!)}
           variant="outline"
           className="mb-5"
-          defaultValue={initialValues?.quantity}
+          defaultValue={
+            initialValues?.quantity
+              ? parseFloat(initialValues.quantity)
+              : undefined
+          }
           required
           // Need discussion
           // disabled={isTranslateProduct}

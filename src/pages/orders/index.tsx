@@ -2,7 +2,7 @@ import Card from '@/components/common/card';
 import Layout from '@/components/layouts/admin';
 import Search from '@/components/common/search';
 import OrderList from '@/components/order/order-list';
-import { Fragment, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import ErrorMessage from '@/components/ui/error-message';
 import Loader from '@/components/ui/loader/loader';
 import { useOrdersQuery } from '@/data/order';
@@ -18,6 +18,9 @@ import { Menu, Transition } from '@headlessui/react';
 import classNames from 'classnames';
 import { DownloadIcon } from '@/components/icons/download-icon';
 import PageHeading from '@/components/common/page-heading';
+import { useQuery } from 'react-query';
+import { getOrders } from '@/services/orders';
+import { getErrorMessage } from '@/utils/helpers';
 
 export default function Orders() {
   const router = useRouter();
@@ -40,45 +43,55 @@ export default function Orders() {
     setPage(current);
   }
 
-  const { data: shopData, isLoading: fetchingShop } = useShopQuery(
-    {
-      slug: shop as string,
-    },
-    {
-      enabled: !!shop,
-    }
-  );
-  const shopId = shopData?.id!;
-  const { orders, loading, paginatorInfo, error } = useOrdersQuery({
-    language: locale,
-    limit: 20,
-    page,
-    orderBy,
-    sortedBy,
-    tracking_number: searchTerm,
+  // const { data: shopData, isLoading: fetchingShop } = useShopQuery(
+  //   {
+  //     slug: shop as string,
+  //   },
+  //   {
+  //     enabled: !!shop,
+  //   }
+  // );
+  // const shopId = shopData?.id!;
+  // const { orders, loading, paginatorInfo, error } = useOrdersQuery({
+  //   language: locale,
+  //   limit: 20,
+  //   page,
+  //   orderBy,
+  //   sortedBy,
+  //   tracking_number: searchTerm,
+  // });
+  // const { refetch } = useExportOrderQuery(
+  //   {
+  //     ...(shopId && { shop_id: shopId }),
+  //   },
+  //   { enabled: false }
+  // );
+
+  const ordersQuery = useQuery(['get_orders'], () => {
+    return getOrders();
   });
-  const { refetch } = useExportOrderQuery(
-    {
-      ...(shopId && { shop_id: shopId }),
-    },
-    { enabled: false }
-  );
 
-  if (loading) return <Loader text={t('common:text-loading')} />;
-
-  if (loading) return <Loader text={t('common:text-loading')} />;
-  if (error) return <ErrorMessage message={error.message} />;
-
-  async function handleExportOrder() {
-    const { data } = await refetch();
-
-    if (data) {
-      const a = document.createElement('a');
-      a.href = data;
-      a.setAttribute('download', 'export-order');
-      a.click();
+  const orders = useMemo(() => {
+    if (ordersQuery.data?.data) {
+      return ordersQuery.data.data;
     }
-  }
+    return [];
+  }, [ordersQuery.isLoading, ordersQuery.data]);
+
+  if (ordersQuery.isLoading) return <Loader text={t('common:text-loading')} />;
+  if (ordersQuery.isError)
+    return <ErrorMessage message={getErrorMessage(ordersQuery.error)} />;
+
+  // async function handleExportOrder() {
+  //   const { data } = await refetch();
+
+  //   if (data) {
+  //     const a = document.createElement('a');
+  //     a.href = data;
+  //     a.setAttribute('download', 'export-order');
+  //     a.click();
+  //   }
+  // }
 
   // TODO : this area need to be checked in Pixer
 
@@ -95,7 +108,7 @@ export default function Orders() {
             className="w-full"
             placeholderText={t('form:input-placeholder-search-tracking-number')}
           />
-          <Menu
+          {/* <Menu
             as="div"
             className="relative inline-block ltr:text-left rtl:text-right"
           >
@@ -135,13 +148,13 @@ export default function Orders() {
                 </Menu.Item>
               </Menu.Items>
             </Transition>
-          </Menu>
+          </Menu> */}
         </div>
       </Card>
 
       <OrderList
         orders={orders}
-        paginatorInfo={paginatorInfo}
+        paginatorInfo={null}
         onPagination={handlePagination}
         onOrder={setOrder}
         onSort={setColumn}
