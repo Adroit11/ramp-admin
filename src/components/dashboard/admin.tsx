@@ -22,12 +22,16 @@ import cn from 'classnames';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import LowStockProduct from '@/components/product/product-stock';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { EaringIcon } from '@/components/icons/summary/earning';
 import { ShoppingIcon } from '@/components/icons/summary/shopping';
 import { BasketIcon } from '@/components/icons/summary/basket';
 import { ChecklistIcon } from '../icons/summary/checklist';
 import Search from '../common/search';
+import { useQuery } from 'react-query';
+import { getOrders } from '@/services/orders';
+import { getErrorMessage } from '@/utils/helpers';
+import { useAuth } from '@/hooks/useAuth';
 
 // const TotalOrderByStatus = dynamic(
 //   () => import('@/components/dashboard/total-order-by-status')
@@ -56,6 +60,7 @@ const TopRatedProducts = dynamic(
 
 export default function Dashboard() {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const { locale } = useRouter();
   // const { data, isLoading: loading } = useAnalyticsQuery();
   const [page, setPage] = useState(1);
@@ -145,6 +150,21 @@ export default function Dashboard() {
     { name: t('text-yearly'), day: 365 },
   ];
 
+  const ordersQuery = useQuery(['get_orders'], () => {
+    return getOrders();
+  });
+
+  const orders = useMemo(() => {
+    if (ordersQuery.data?.data) {
+      return ordersQuery.data.data;
+    }
+    return [];
+  }, [ordersQuery.isLoading, ordersQuery.data]);
+
+  if (ordersQuery.isLoading) return <Loader text={t('common:text-loading')} />;
+  if (ordersQuery.isError)
+    return <ErrorMessage message={getErrorMessage(ordersQuery.error)} />;
+
   // useEffect(() => {
   //   switch (activeTimeFrame) {
   //     case 1:
@@ -202,20 +222,20 @@ export default function Dashboard() {
             subtitleTransKey="sticker-card-subtitle-rev"
             icon={<EaringIcon className="h-8 w-8" />}
             color="#1EAE98"
-            price={0}
+            price={user?.statistics?.total_shops}
           />
           <StickerCard
             titleTransKey="Total Products"
             subtitleTransKey="sticker-card-subtitle-order"
             icon={<ShoppingIcon className="h-8 w-8" />}
             color="#865DFF"
-            price={0}
+            price={user?.statistics?.total_products}
           />
           <StickerCard
             titleTransKey="Total Orders"
             icon={<ChecklistIcon className="h-8 w-8" />}
             color="#D74EFF"
-            price={0}
+            price={user?.statistics?.total_orders}
           />
           {/* <StickerCard
             titleTransKey="sticker-card-title-total-shops"
@@ -270,18 +290,18 @@ export default function Dashboard() {
 
       <RecentOrders
         className="col-span-full"
-        orders={[]}
+        orders={orders}
         paginatorInfo={null}
         title={t('table:recent-order-table-title')}
         onPagination={handlePagination}
-        searchElement={
-          <Search
-            onSearch={handleSearch}
-            placeholderText={t('form:input-placeholder-search-name')}
-            className="hidden max-w-sm sm:inline-block [&button]:top-0.5"
-            inputClassName="!h-10"
-          />
-        }
+        // searchElement={
+        //   <Search
+        //     onSearch={handleSearch}
+        //     placeholderText={t('form:input-placeholder-search-name')}
+        //     className="hidden max-w-sm sm:inline-block [&button]:top-0.5"
+        //     inputClassName="!h-10"
+        //   />
+        // }
       />
       {/* <div className="lg:col-span-full 2xl:col-span-8">
         <ColumnChart

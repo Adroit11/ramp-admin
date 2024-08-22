@@ -159,20 +159,20 @@ const OwnerShopLayout = () => {
             // subtitleTransKey="sticker-card-subtitle-rev"
             icon={<EaringIcon className="h-8 w-8" />}
             color="#047857"
-            price={'1000'}
+            price={user?.statistics?.total_products}
           />
           <StickerCard
             titleTransKey="sticker-card-title-order"
             // subtitleTransKey="sticker-card-subtitle-order"
             icon={<ShoppingIcon className="h-8 w-8" />}
             color="#865DFF"
-            price={'1000'}
+            price={user?.statistics?.total_orders}
           />
           <StickerCard
             titleTransKey="sticker-card-title-total-shops"
             icon={<BasketIcon className="h-8 w-8" />}
             color="#E157A0"
-            price={'1000'}
+            price={user?.statistics?.total_shops}
           />
           {/* <StickerCard
             titleTransKey="sticker-card-title-today-rev"

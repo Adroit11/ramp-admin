@@ -7,11 +7,13 @@ export interface CreateShopDataType {
   address: string[];
   cover_image: File;
   image: File;
+  url?: string;
 }
 export interface EditShopDataType {
   uid: string;
   description: string;
   address: string[];
+  url?: string;
   cover_image?: File | string;
   image?: File | string;
 
@@ -23,12 +25,16 @@ export const createShopFn = async (data: CreateShopDataType) => {
     const newData = new FormData();
     newData.append('name', data.name);
     newData.append('description', data.description);
-    newData.append('address["address"]', data.address[0]);
-    newData.append('address["city"]', data.address[1]);
-    newData.append('address["state"]', data.address[2]);
-    newData.append('address["country"]', data.address[3]);
+    newData.append('address[1]', data.address[0]);
+    newData.append('address[2]', data.address[1]);
+    newData.append('address[3]', data.address[2]);
+    newData.append('address[4]', data.address[3]);
     newData.append('image', data.image);
     newData.append('cover_image', data.cover_image);
+
+    if (data.url) {
+      newData.append('url', data.url);
+    }
 
     const res = await request.post('/shop', newData, {
       headers: {
@@ -47,12 +53,16 @@ export const editShopFn = async (data: EditShopDataType) => {
     const newData = new FormData();
     newData.append('uid', data.uid);
     newData.append('description', data.description);
-    newData.append('address["address"]', data.address[0]);
-    newData.append('address["city"]', data.address[1]);
-    newData.append('address["state"]', data.address[2]);
-    newData.append('address["country"]', data.address[3]);
+    newData.append('address[1]', data.address[0]);
+    newData.append('address[2]', data.address[1]);
+    newData.append('address[3]', data.address[2]);
+    newData.append('address[4]', data.address[3]);
     // newData.append('image', data.image);
     // newData.append('cover_image', data.cover_image);
+
+    if (data.url) {
+      newData.append('url', data.url);
+    }
 
     const res = await request.post('/shop/update', newData, {
       headers: {

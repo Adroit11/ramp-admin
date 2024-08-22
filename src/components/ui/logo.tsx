@@ -1,25 +1,17 @@
 import Link from '@/components/ui/link';
 import cn from 'classnames';
 import { siteSettings } from '@/settings/site.settings';
-import { useSettings } from '@/contexts/settings.context';
-import { LogoSVG } from '@/components/icons/logo';
-import LogoText from '@/components/icons/logo-text';
 import { useAtom } from 'jotai';
 import { miniSidebarInitialValue } from '@/utils/constants';
 import { useWindowSize } from '@/utils/use-window-size';
 import { RESPONSIVE_WIDTH } from '@/utils/constants';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { useSettingsQuery } from '@/data/settings';
 
 const Logo: React.FC<React.AnchorHTMLAttributes<{}>> = ({
   className,
   ...props
 }) => {
-  const { locale } = useRouter();
-  const { settings } = useSettingsQuery({
-    language: locale!,
-  });
   const [miniSidebar, _] = useAtom(miniSidebarInitialValue);
   const { width } = useWindowSize();
   return (
@@ -36,8 +28,7 @@ const Logo: React.FC<React.AnchorHTMLAttributes<{}>> = ({
             height: siteSettings.collapseLogo.height,
           }}
         >
-          RAMP
-          {/* <Image
+          <Image
             src={
               // settings?.options?.collapseLogo?.original ??
               siteSettings.collapseLogo.url
@@ -50,7 +41,7 @@ const Logo: React.FC<React.AnchorHTMLAttributes<{}>> = ({
             sizes="(max-width: 768px) 100vw"
             className="object-contain"
             loading="eager"
-          /> */}
+          />
         </span>
       ) : (
         <span
@@ -60,8 +51,7 @@ const Logo: React.FC<React.AnchorHTMLAttributes<{}>> = ({
             height: siteSettings.logo.height,
           }}
         >
-          RAMP
-          {/* <Image
+          <Image
             src={
               // ettings?.options?.logo?.original ??
               siteSettings.logo.url
@@ -74,7 +64,7 @@ const Logo: React.FC<React.AnchorHTMLAttributes<{}>> = ({
             sizes="(max-width: 768px) 100vw"
             className="object-contain"
             loading="eager"
-          /> */}
+          />
         </span>
       )}
     </Link>

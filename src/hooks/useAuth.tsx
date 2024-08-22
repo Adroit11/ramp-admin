@@ -34,6 +34,11 @@ export interface UserDetailsType {
     };
   }[];
   shops: Shop[];
+  statistics: {
+    total_products: number;
+    total_shops: number;
+    total_orders: number;
+  };
 }
 
 export const useAuth = () => {

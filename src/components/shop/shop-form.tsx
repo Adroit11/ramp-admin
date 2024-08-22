@@ -51,6 +51,7 @@ import {
 import { toast } from 'react-toastify';
 import { Routes } from '@/config/routes';
 import { getErrorMessage } from '@/utils/helpers';
+import { useAuth } from '@/hooks/useAuth';
 
 // const socialIcon = [
 //   {
@@ -93,9 +94,11 @@ type FormValues = {
   cover_image: File | string;
   image: File | string;
   address: UserAddressInput;
+  url?: string;
 };
 
 const ShopForm = ({ initialValues }: { initialValues?: EditShopDataType }) => {
+  const { user } = useAuth();
   // const [location] = useAtom(locationAtom);
   // const { mutate: createShop, isLoading: creating } = useCreateShopMutation();
   // const { mutate: updateShop, isLoading: updating } = useUpdateShopMutation();
@@ -122,6 +125,7 @@ const ShopForm = ({ initialValues }: { initialValues?: EditShopDataType }) => {
             cover_image: initialValues.cover_image as string,
             name: initialValues.name,
             description: initialValues.description,
+            url: initialValues.url,
             address: {
               street_address: initialValues.address[0],
               city: initialValues.address[1],
@@ -197,6 +201,10 @@ const ShopForm = ({ initialValues }: { initialValues?: EditShopDataType }) => {
         description: values.description,
       };
 
+      if (initialValues.url) {
+        data.url = values.url ?? initialValues.url;
+      }
+
       updateShop.mutate(data);
     } else {
       if (
@@ -220,6 +228,10 @@ const ShopForm = ({ initialValues }: { initialValues?: EditShopDataType }) => {
         ],
       } satisfies CreateShopDataType;
 
+      if (values.url) {
+        data.url = values.url;
+      }
+
       createShop.mutate(data);
     }
   }
@@ -228,7 +240,11 @@ const ShopForm = ({ initialValues }: { initialValues?: EditShopDataType }) => {
     mutationFn: createShopFn,
     onSuccess: () => {
       toast.success('Shop created successfully');
-      router.push(Routes.dashboard);
+      if (user?.role === 'super_admin') {
+        router.push(Routes.shop.list);
+      } else {
+        router.push(Routes.dashboard);
+      }
     },
     onError: (err: any) => {
       toast.error(getErrorMessage(err));
@@ -238,7 +254,11 @@ const ShopForm = ({ initialValues }: { initialValues?: EditShopDataType }) => {
     mutationFn: editShopFn,
     onSuccess: () => {
       toast.success('Shop updated successfully');
-      router.push(Routes.dashboard);
+      if (user?.role === 'super_admin') {
+        router.push(Routes.shop.list);
+      } else {
+        router.push(Routes.dashboard);
+      }
     },
     onError: (err: any) => {
       toast.error(getErrorMessage(err));
@@ -341,7 +361,7 @@ const ShopForm = ({ initialValues }: { initialValues?: EditShopDataType }) => {
               />
             )} */}
 
-            <div className="relative">
+            <div className="relative mb-5">
               {/* {options?.useAi && (
                 <OpenAIButton
                   title={t('form:button-label-description-ai')}
@@ -358,6 +378,14 @@ const ShopForm = ({ initialValues }: { initialValues?: EditShopDataType }) => {
                 required
               />
             </div>
+
+            <Input
+              label={t('Shop Website URL')}
+              {...register('url', {
+                required: false,
+              })}
+              variant="outline"
+            />
           </Card>
         </div>
         {/* <div className="flex flex-wrap pb-8 my-5 border-b border-gray-300 border-dashed sm:my-8">

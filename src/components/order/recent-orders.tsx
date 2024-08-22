@@ -21,7 +21,7 @@ type IProps = {
   orders: Order[];
   paginatorInfo: MappedPaginatorInfo | null;
   onPagination: (current: number) => void;
-  searchElement: React.ReactNode;
+  searchElement?: React.ReactNode;
   title?: string;
   className?: string;
 };
@@ -116,16 +116,16 @@ const RecentOrders = ({
     },
     {
       title: t('table:table-item-actions'),
-      dataIndex: 'id',
+      dataIndex: 'uid',
       key: 'actions',
       align: alignRight,
       width: 120,
-      render: (id: string, order: Order) => {
+      render: (uid: string, order: Order) => {
         return (
           <>
             <ActionButtons
-              id={id}
-              detailsUrl={`${Routes.order.list}/${id}`}
+              id={uid}
+              detailsUrl={`${Routes.order.list}/${uid}`}
               customLocale={order.language}
             />
           </>
@@ -139,7 +139,7 @@ const RecentOrders = ({
       <div
         className={cn(
           'overflow-hidden rounded-lg bg-white p-6 md:p-7',
-          className
+          className,
         )}
       >
         <div className="flex items-center justify-between pb-6 md:pb-7">

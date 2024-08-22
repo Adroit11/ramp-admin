@@ -41,6 +41,32 @@ export const updateStoreOwnerDetailsFn = async (
   }
 };
 
+export const updateAdminDetailsFn = async (
+  data: UpdateStoreOwnerDetailsType,
+) => {
+  try {
+    const res = await request.post('/user/admin/update', data);
+
+    return res.data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+};
+
+export const addAdminFn = async (data: {
+  name: string;
+  email: string;
+  password: string;
+}) => {
+  try {
+    const res = await request.post('/user/admin/add', data);
+
+    return res.data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+};
+
 // ORDERS
 
 export const getOrders = async () => {

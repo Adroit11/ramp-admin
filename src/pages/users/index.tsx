@@ -13,16 +13,25 @@ import { Routes } from '@/config/routes';
 import { SortOrder } from '@/types';
 import { adminOnly } from '@/utils/auth-utils';
 import PageHeading from '@/components/common/page-heading';
-import { useQuery } from 'react-query';
-import { getAdminsFn, getStoreOwnersFn } from '@/services/orders';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { addAdminFn, getAdminsFn, getStoreOwnersFn } from '@/services/orders';
 import { AdminsDataType, StoreOwnerDataType } from '@/types/users';
 import { getErrorMessage } from '@/utils/helpers';
 import Button from '@/components/ui/button';
+import { toast } from 'react-toastify';
+import Modal from '@/components/ui/modal/modal';
+import Input from '@/components/ui/input';
 
 export default function AllUsersPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState<1 | 2>(1);
-
+  const queryClient = useQueryClient();
+  const [openAddModal, setOpenAddModal] = useState(false);
+  const [newAdminVal, setNewAdminVal] = useState({
+    name: '',
+    email: '',
+    password: '',
+  });
   const [page, setPage] = useState(1);
   const { t } = useTranslation();
 
@@ -61,7 +70,25 @@ export default function AllUsersPage() {
     return null;
   }, [adminsQuery.isLoading, adminsQuery.data, searchTerm]);
 
-  console.log('oooo', searchTerm);
+  const addAdminMutation = useMutation({
+    mutationFn: addAdminFn,
+    onSuccess: () => {
+      toast.success('Admin added successfully');
+      setOpenAddModal(false);
+      setNewAdminVal({
+        name: '',
+        email: '',
+        password: '',
+      });
+    },
+    onError: (err) => {
+      toast.error(getErrorMessage(err));
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries('get_admins');
+    },
+  });
+  // console.log('oooo', searchTerm);
   // const { users, paginatorInfo, loading, error } = useUsersQuery({
   //   limit: 20,
   //   page,
@@ -158,12 +185,14 @@ export default function AllUsersPage() {
                 placeholderText={t('form:input-placeholder-search-name')}
               />
 
-              {/* <LinkButton
-            href={`${Routes.user.create}`}
-            className="h-12 w-full md:w-auto md:ms-6"
-          >
-            <span>+ {t('form:button-label-add-user')}</span>
-          </LinkButton> */}
+              <Button
+                className="h-12 w-full md:w-auto md:ms-6"
+                onClick={() => {
+                  setOpenAddModal(true);
+                }}
+              >
+                <span>+ {t('Add Admin')}</span>
+              </Button>
             </div>
           </Card>
 
@@ -173,10 +202,90 @@ export default function AllUsersPage() {
             onPagination={handlePagination}
             onOrder={setOrder}
             onSort={setColumn}
-            hideActions
+            isAdmin
           />
         </>
       )}
+
+      {/* add admin */}
+      <Modal
+        open={openAddModal}
+        onClose={() => {
+          setOpenAddModal(false);
+        }}
+      >
+        <div className="m-auto w-full max-w-md rounded-md bg-light p-4 pb-6 sm:w-[24rem] md:rounded-xl">
+          <div className="h-full w-full text-center">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (
+                  newAdminVal.email &&
+                  newAdminVal.name &&
+                  newAdminVal.password
+                ) {
+                  addAdminMutation.mutate(newAdminVal);
+                } else {
+                  toast.error('Missing fields');
+                }
+              }}
+            >
+              <div className="py-6">
+                <Input
+                  label={'Name'}
+                  name="new_admin_name"
+                  variant="outline"
+                  className="mb-5 flex flex-col items-start"
+                  onChange={(e) => {
+                    setNewAdminVal((prev) => ({
+                      ...prev,
+                      name: e.target.value,
+                    }));
+                  }}
+                  required
+                />
+                <Input
+                  label={'Email'}
+                  name="new_admin_email"
+                  type={'email'}
+                  variant="outline"
+                  className="mb-5 flex flex-col items-start"
+                  onChange={(e) => {
+                    setNewAdminVal((prev) => ({
+                      ...prev,
+                      email: e.target.value,
+                    }));
+                  }}
+                  required
+                />
+                <Input
+                  label={'Password'}
+                  name="new_admin_password"
+                  type={'password'}
+                  variant="outline"
+                  className="mb-5 flex flex-col items-start"
+                  onChange={(e) => {
+                    setNewAdminVal((prev) => ({
+                      ...prev,
+                      password: e.target.value,
+                    }));
+                  }}
+                  required
+                />
+
+                <div className="mt-6">
+                  <Button
+                    className="!px-10"
+                    loading={addAdminMutation.isLoading}
+                  >
+                    Add Admin
+                  </Button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </Modal>
     </>
   );
 }

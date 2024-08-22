@@ -15,8 +15,7 @@ export default function AuthPageLayout({
     >
       <div className="m-auto w-full max-w-[420px] rounded bg-light p-5 sm:p-8 sm:shadow">
         <div className="mb-2 flex justify-center text-xl font-serif font-semibold text-accent">
-          {/* <Logo /> */}
-          RAMP
+          <Logo />
         </div>
         {children}
       </div>
