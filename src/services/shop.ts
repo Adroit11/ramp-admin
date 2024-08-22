@@ -14,6 +14,7 @@ export interface EditShopDataType {
   description: string;
   address: string[];
   url?: string;
+  shop_website_link?: string;
   cover_image?: File | string;
   image?: File | string;
 

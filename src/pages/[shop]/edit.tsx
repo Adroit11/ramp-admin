@@ -73,6 +73,7 @@ export default function UpdateShopPage() {
             image: shopData.logo,
             cover_image: shopData.cover_image,
             address: Object.values(shopData.address),
+            url: shopData.shop_website_link,
           }}
         />
       ) : null}

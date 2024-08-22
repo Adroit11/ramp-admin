@@ -36,6 +36,7 @@ export interface GetShopDetailsTypeForOwner {
   address: Record<string, string>;
   created_at: string;
   updated_at: string;
+  shop_website_link: string;
 }
 
 export interface GetShopProductTypeForOwner {
