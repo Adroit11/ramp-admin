@@ -1,26 +1,24 @@
 import dynamic from 'next/dynamic';
-import type { GetServerSideProps } from 'next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import {
-  allowedRoles,
-  getAuthCredentials,
-  hasAccess,
-  isAuthenticated,
-} from '@/utils/auth-utils';
-import { SUPER_ADMIN } from '@/utils/constants';
+import { getUserAuthData } from '@/utils/auth-utils';
 import AppLayout from '@/components/layouts/app';
+import { GetServerSideProps } from 'next';
 import { Routes } from '@/config/routes';
-import { Config } from '@/config';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { UserAuthType } from '@/types/auth';
 
-const AdminDashboard = dynamic(() => import('@/components/dashboard/admin'));
-const OwnerDashboard = dynamic(() => import('@/components/dashboard/owner'));
+const AdminDashboard = dynamic(() => import('@/components/dashboard/admin'), {
+  ssr: false,
+});
+const OwnerDashboard = dynamic(() => import('@/components/dashboard/owner'), {
+  ssr: false,
+});
 
 export default function Dashboard({
-  userPermissions,
+  userAuthData,
 }: {
-  userPermissions: string[];
+  userAuthData: UserAuthType;
 }) {
-  if (userPermissions?.includes(SUPER_ADMIN)) {
+  if (userAuthData?.role === 'super_admin') {
     return <AdminDashboard />;
   }
   return <OwnerDashboard />;
@@ -31,15 +29,18 @@ Dashboard.Layout = AppLayout;
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale } = ctx;
   // TODO: Improve it
-  const generateRedirectUrl =
-    locale !== Config.defaultLanguage
-      ? `/${locale}${Routes.login}`
-      : Routes.login;
-  const { token, permissions } = getAuthCredentials(ctx);
-  if (
-    !isAuthenticated({ token, permissions }) ||
-    !hasAccess(allowedRoles, permissions)
-  ) {
+  const generateRedirectUrl = Routes.login;
+  // const generateRedirectUrl =
+  //   locale !== Config.defaultLanguage
+  //     ? `/${locale}${Routes.login}`
+  //     : Routes.login;
+  // const { token, permissions } = getAuthCredentials(ctx);
+  // if (
+  //   !isAuthenticated({ token, permissions }) ||
+  //   !hasAccess(allowedRoles, permissions)
+  // ) {
+
+  if (!getUserAuthData(ctx)) {
     return {
       redirect: {
         destination: generateRedirectUrl,
@@ -50,19 +51,21 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   if (locale) {
     return {
       props: {
-        ...(await serverSideTranslations(locale, [
+        ...(await serverSideTranslations('en', [
           'common',
           'form',
           'table',
           'widgets',
         ])),
-        userPermissions: permissions,
+        userPermissions: [],
+        userAuthData: getUserAuthData(ctx),
       },
     };
   }
   return {
     props: {
-      userPermissions: permissions,
+      userPermissions: getUserAuthData(ctx) ? [getUserAuthData(ctx)?.role] : [],
+      userAuthData: getUserAuthData(ctx),
     },
   };
 };

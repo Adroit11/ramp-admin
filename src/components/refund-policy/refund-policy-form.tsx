@@ -209,12 +209,12 @@ export default function CreateOrUpdateRefundPolicyForm({
           )}
 
           <div className="relative">
-            {options?.useAi && (
+            {/* {options?.useAi && (
               <OpenAIButton
                 title={t('form:button-label-description-ai')}
                 onClick={handleGenerateDescription}
               />
-            )}
+            )} */}
             <TextArea
               label={t('form:input-label-refund-policy-description')}
               {...register('description')}

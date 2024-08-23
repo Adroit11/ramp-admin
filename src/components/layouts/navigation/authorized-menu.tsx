@@ -9,10 +9,16 @@ import { useMeQuery } from '@/data/user';
 import { getIcon } from '@/utils/get-icon';
 import * as sidebarIcons from '@/components/icons/sidebar';
 import { useRouter } from 'next/router';
-import { getAuthCredentials, hasAccess } from '@/utils/auth-utils';
+import {
+  getAuthCredentials,
+  getUserAuthData,
+  hasAccess,
+} from '@/utils/auth-utils';
 
 export default function AuthorizedMenu() {
-  const { data } = useMeQuery();
+  // const { data } = useMeQuery();
+  const userAuthData = getUserAuthData();
+
   const { t } = useTranslation('common');
   const { pathname, query } = useRouter();
   const slug = (pathname === '/[shop]' && query?.shop) || '';
@@ -26,20 +32,17 @@ export default function AuthorizedMenu() {
     >
       <Menu.Button className="flex max-w-[150px] items-center gap-2 focus:outline-none lg:py-0.5 xl:py-2.5">
         <Avatar
-          src={
-            data?.profile?.avatar?.thumbnail ??
-            siteSettings?.avatar?.placeholder
-          }
+          src={siteSettings?.avatar?.placeholder}
           rounded="full"
           name="avatar"
           className="shrink-0 grow-0 basis-auto drop-shadow"
         />
         <div className="hidden w-[calc(100%-48px)] flex-col items-start space-y-0.5 truncate text-sm ltr:text-left rtl:text-right xl:flex">
           <span className="w-full truncate font-semibold capitalize text-black">
-            {data?.name}
+            {userAuthData?.user?.name ?? ''}
           </span>
           <span className="w-full truncate text-xs capitalize text-gray-400">
-            {role ? role.split('_').join(' ') : data?.email}
+            {role ? role.split('_').join(' ') : userAuthData?.user?.email ?? ''}
           </span>
         </div>
       </Menu.Button>
@@ -61,19 +64,16 @@ export default function AuthorizedMenu() {
             <li className="border-b border-dashed border-gray-200 p-2 focus:outline-none">
               <div className="flex items-center gap-2 rounded-md bg-gray-100 px-3 py-2">
                 <Avatar
-                  src={
-                    data?.profile?.avatar?.thumbnail ??
-                    siteSettings?.avatar?.placeholder
-                  }
+                  src={siteSettings?.avatar?.placeholder}
                   name="avatar"
                   className="shrink-0 grow-0 basis-auto drop-shadow"
                 />
                 <div className="flex w-[calc(100%-40px)] flex-col items-start space-y-0.5 text-sm">
                   <span className="w-full truncate font-semibold capitalize text-black">
-                    {data?.name}
+                    {userAuthData?.user?.name ?? ''}
                   </span>
                   <span className="break-all text-xs text-gray-400">
-                    {data?.email}
+                    {userAuthData?.user?.email ?? ''}
                   </span>
                 </div>
               </div>
@@ -82,7 +82,7 @@ export default function AuthorizedMenu() {
           <div className="space-y-0.5 py-2">
             {siteSettings?.authorizedLinks?.map(
               ({ href, labelTransKey, icon, permission }, index) => {
-                const hasPermission = permission?.includes(role!);
+                const hasPermission = true;
                 return (
                   <Fragment key={index}>
                     {hasPermission && (
@@ -91,7 +91,7 @@ export default function AuthorizedMenu() {
                           <>
                             <li
                               className={cn(
-                                'cursor-pointer border-dashed border-gray-200 px-2 last:!mt-2.5 last:border-t last:pt-2'
+                                'cursor-pointer border-dashed border-gray-200 px-2 last:!mt-2.5 last:border-t last:pt-2',
                               )}
                             >
                               <Link
@@ -100,7 +100,7 @@ export default function AuthorizedMenu() {
                                   'group flex items-center gap-2 rounded-md py-2.5 px-3 text-sm capitalize transition duration-200 hover:text-accent',
                                   active
                                     ? 'border-transparent bg-gray-100 text-accent'
-                                    : 'text-heading'
+                                    : 'text-heading',
                                 )}
                               >
                                 <span className="text-gray-600 group-hover:text-accent">
@@ -119,7 +119,7 @@ export default function AuthorizedMenu() {
                     )}
                   </Fragment>
                 );
-              }
+              },
             )}
           </div>
         </Menu.Items>

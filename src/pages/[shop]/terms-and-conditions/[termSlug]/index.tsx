@@ -47,7 +47,8 @@ const TermsAndConditionsPage = () => {
   let currentUser = 'vendor';
 
   if (currentUser === 'vendor') {
-    const isEnableTermsRoute = settings?.options?.enableTerms;
+    // const isEnableTermsRoute = settings?.options?.enableTerms;
+    const isEnableTermsRoute = false;
     const routePermission = isEnableTermsRoute ? adminAndOwnerOnly : adminOnly;
     const isSuperAdmin = hasAccess(adminOnly, permissions);
     const hasPermission = hasAccess(routePermission, permissions);

@@ -69,7 +69,7 @@ export default function CreateOrUpdateFlashSaleForm({ initialValues }: IProps) {
   const [type, setType] = useState('');
   const [category, setCategory] = useState('');
   const { permissions } = getAuthCredentials();
-  const { data: user, isLoading: loading, error } = useMeQuery();
+  // const { data: user, isLoading: loading, error } = useMeQuery();
   const { currency } = useSettings();
   const { openModal } = useModalAction();
   const {

@@ -78,7 +78,7 @@ export default function VendorProductStockPage() {
 
   if (
     !hasAccess(adminOnly, permissions) &&
-    !me?.shops?.map((shop) => shop.id).includes(shopId) &&
+    // !me?.shops?.map((shop) => shop.id).includes(shopId) &&
     me?.managed_shop?.id != shopId
   ) {
     router.replace(Routes.dashboard);
@@ -133,7 +133,7 @@ export default function VendorProductStockPage() {
         </div>
       </Card>
       <ProductList
-        products={products}
+        products={[]}
         paginatorInfo={paginatorInfo}
         onPagination={handlePagination}
         onOrder={setOrder}

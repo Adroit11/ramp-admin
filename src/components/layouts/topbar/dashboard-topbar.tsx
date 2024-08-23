@@ -11,7 +11,7 @@ type IProps = {};
 
 const DashboardTopBar = ({}: IProps) => {
   const { locale } = useRouter();
-  const { data, isLoading: meLoading, error: meError } = useMeQuery();
+  // const { data, isLoading: meLoading, error: meError } = useMeQuery();
   const {
     // @ts-ignore
     settings: { options },
@@ -25,7 +25,7 @@ const DashboardTopBar = ({}: IProps) => {
         <VisitStore />
         <SearchBar />
 
-        {options?.pushNotification?.all?.message ? (
+        {/* {options?.pushNotification?.all?.message ? (
           <MessageBar user={data} />
         ) : (
           ''
@@ -41,7 +41,7 @@ const DashboardTopBar = ({}: IProps) => {
           <RecentOrderBar user={data} />
         ) : (
           ''
-        )}
+        )} */}
       </div>
     </>
   );

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Creator: CorelDRAW 2021 (64-Bit) -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="11.6929in" height="8.26772in" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 11692.91 8267.72"
+ xmlns:xlink="http://www.w3.org/1999/xlink"
+ xmlns:xodm="http://www.corel.com/coreldraw/odm/2003">
+ <defs>
+  <font id="FontID0" horiz-adv-x="695" font-variant="normal" style="fill-rule:nonzero" font-weight="500">
+	<font-face 
+		font-family="Clash Grotesk Medium">
+		<font-face-src>
+			<font-face-name name="Clash Grotesk Medium"/>
+		</font-face-src>
+	</font-face>
+   <missing-glyph><path d="M0 0z"/></missing-glyph>
+   <glyph unicode="A" horiz-adv-x="695" d="M122 0l68.0006 174.001 310.999 0 68.0006 -174.001 117 0 -261.001 669.999 -154.999 0 -261 -669.999 112.999 0zm176 448l43.9997 124.001 7.9998 0 43.0007 -124.001 70.0002 -176.999 -235.001 0 70.0002 176.999z"/>
+   <glyph unicode="M" horiz-adv-x="845" d="M164 0l0 396 -6.00024 112 9.00035 0 40.0006 -112 150.999 -356 130.001 0 150 356 42.0001 112 6.99925 0 -3.99913 -112 0 -396 106.999 0 0 669.999 -153 0 -150 -367.999 -57.9997 -160.001 -7.9998 0 -59.0003 160.001 -153 367.999 -153 0 0 -669.999 108 0z"/>
+   <glyph unicode="P" horiz-adv-x="606" d="M164 0l0 215.999 177.001 0c139.999,0 242.999,83.0012 242.999,227.001 0,144 -103,226.999 -242.999,226.999l-285 0 0 -669.999 108 0zm190 573c87.9994,0 123,-33.9988 123,-129.999 0,-96.0007 -35.0009,-129.999 -123,-129.999l-190 0 0 259.999 190 0z"/>
+   <glyph unicode="R" horiz-adv-x="617" d="M164 0l0 257.999 79.0006 0c79.9996,0 108,-26.9995 139,-84.9993l95.0002 -173 125 0 -99.9998 186c-25,46.0008 -54.0006,76.0004 -103,92l0 7.9998c117.999,6.00024 186,73.0003 186,184 0,127.001 -93.0006,200 -240.999,200l-288.001 0 0 -669.999 108 0zm0 573l193 0c87.0004,0 120,-33.9988 120,-112.999 0,-81.0001 -32.9998,-113.001 -120,-113.001l-193 0 0 226z"/>
+  </font>
+  <style type="text/css">
+   <![CDATA[
+    @font-face { font-family:"Clash Grotesk Medium";font-variant:normal;font-weight:500;src:url("#FontID0") format(svg)}
+    .fil0 {fill:#FDBFCA}
+    .fnt0 {font-weight:500;font-size:2565.52px;font-family:'Clash Grotesk Medium'}
+   ]]>
+  </style>
+ </defs>
+ <g id="Layer_x0020_1">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <g id="_1641413336992">
+   <text x="2516.62" y="4996.11"  class="fil0 fnt0">R</text>
+   <text x="3937.94" y="4996.11"  class="fil0 fnt0">A</text>
+   <text x="5533.71" y="4996.11"  class="fil0 fnt0">M</text>
+   <text x="7533.95" y="4996.11"  class="fil0 fnt0">P</text>
+  </g>
+ </g>
+</svg>

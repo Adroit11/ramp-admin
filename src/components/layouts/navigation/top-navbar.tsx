@@ -21,6 +21,7 @@ import {
   adminOnly,
   getAuthCredentials,
   hasAccess,
+  isStoreOwner,
 } from '@/utils/auth-utils';
 import {
   RESPONSIVE_WIDTH,
@@ -48,54 +49,54 @@ export const isInArray = (array: Date[], value: Date) => {
 const Navbar = () => {
   const { t } = useTranslation();
   const { toggleSidebar } = useUI();
-  const { permissions } = getAuthCredentials();
-  const { enableMultiLang } = Config;
+  // const { permissions } = getAuthCredentials();
+  // const { enableMultiLang } = Config;
   const { locale } = useRouter();
-  const { data } = useMeQuery();
+  // const { data } = useMeQuery();
   const { openModal } = useModalAction();
   const [searchModal, setSearchModal] = useAtom(searchModalInitialValues);
   const [miniSidebar, setMiniSidebar] = useAtom(miniSidebarInitialValue);
 
-  const [isMaintenanceMode, setUnderMaintenance] = useAtom(
-    checkIsMaintenanceModeComing,
-  );
+  // const [isMaintenanceMode, setUnderMaintenance] = useAtom(
+  //   checkIsMaintenanceModeComing,
+  // );
   const [isMaintenanceModeStart, setUnderMaintenanceStart] = useAtom(
     checkIsMaintenanceModeStart,
   );
   const { width } = useWindowSize();
-  const { settings, loading } = useSettingsQuery({ language: locale! });
+  // const { settings, loading } = useSettingsQuery({ language: locale! });
 
-  useEffect(() => {
-    if (
-      settings?.options?.maintenance?.start &&
-      settings?.options?.maintenance?.until
-    ) {
-      const dateInterVal = eachDayOfInterval({
-        start: new Date(settings?.options?.maintenance?.start as string),
-        end: new Date(settings?.options?.maintenance?.until as string),
-      });
-      const beforeDay = isTomorrow(
-        new Date(settings?.options?.maintenance?.start as string),
-      );
-      const checkIsMaintenance =
-        beforeDay && settings?.options?.isUnderMaintenance;
-      const checkIsMaintenanceStart =
-        isInArray(dateInterVal, new Date()) &&
-        settings?.options?.isUnderMaintenance;
-      setUnderMaintenance(checkIsMaintenance as boolean);
-      setUnderMaintenanceStart(checkIsMaintenanceStart as boolean);
-    }
-  }, [
-    settings?.options?.maintenance?.start,
-    settings?.options?.maintenance?.until,
-    settings?.options?.isUnderMaintenance,
-  ]);
+  // useEffect(() => {
+  //   if (
+  //     settings?.options?.maintenance?.start &&
+  //     settings?.options?.maintenance?.until
+  //   ) {
+  //     const dateInterVal = eachDayOfInterval({
+  //       start: new Date(settings?.options?.maintenance?.start as string),
+  //       end: new Date(settings?.options?.maintenance?.until as string),
+  //     });
+  //     const beforeDay = isTomorrow(
+  //       new Date(settings?.options?.maintenance?.start as string),
+  //     );
+  //     const checkIsMaintenance =
+  //       beforeDay && settings?.options?.isUnderMaintenance;
+  //     const checkIsMaintenanceStart =
+  //       isInArray(dateInterVal, new Date()) &&
+  //       settings?.options?.isUnderMaintenance;
+  //     setUnderMaintenance(checkIsMaintenance as boolean);
+  //     setUnderMaintenanceStart(checkIsMaintenanceStart as boolean);
+  //   }
+  // }, [
+  //   settings?.options?.maintenance?.start,
+  //   settings?.options?.maintenance?.until,
+  //   settings?.options?.isUnderMaintenance,
+  // ]);
 
-  if (loading) {
-    return <Loader showText={false} />;
-  }
+  // if (loading) {
+  //   return <Loader showText={false} />;
+  // }
 
-  const { options } = settings!;
+  // const { options } = settings!;
 
   function handleClick() {
     openModal('SEARCH_VIEW');
@@ -104,7 +105,7 @@ const Navbar = () => {
 
   return (
     <header className="fixed top-0 z-40 w-full bg-white shadow">
-      {width >= RESPONSIVE_WIDTH && isMaintenanceMode ? (
+      {/* {width >= RESPONSIVE_WIDTH && isMaintenanceMode ? (
         <Alert
           message={t('text-maintenance-mode-title')}
           variant="info"
@@ -118,7 +119,7 @@ const Navbar = () => {
         </Alert>
       ) : (
         ''
-      )}
+      )} */}
       {width >= RESPONSIVE_WIDTH && isMaintenanceModeStart ? (
         <Alert
           message={t('text-maintenance-mode-start-title')}
@@ -183,7 +184,7 @@ const Navbar = () => {
           </div>
 
           <div className="flex shrink-0 grow-0 basis-auto items-center">
-            {hasAccess(adminAndOwnerOnly, permissions) && (
+            {isStoreOwner() && (
               <>
                 <div className="hidden border-gray-200/80 px-6 py-5 border-e 2xl:block">
                   <LinkButton
@@ -199,7 +200,7 @@ const Navbar = () => {
                   <VisitStore />
                 </div>
 
-                {options?.pushNotification?.all?.order ||
+                {/* {options?.pushNotification?.all?.order ||
                 options?.pushNotification?.all?.message ||
                 options?.pushNotification?.all?.storeNotice ? (
                   <div className="flex items-center gap-3 px-0.5 py-3 sm:relative sm:border-gray-200/80 sm:py-3.5 sm:px-6 sm:border-s lg:py-5">
@@ -223,12 +224,12 @@ const Navbar = () => {
                       )
                     ) : null}
                   </div>
-                ) : null}
+                ) : null} */}
               </>
             )}
           </div>
 
-          {enableMultiLang ? <LanguageSwitcher /> : null}
+          {/* {enableMultiLang ? <LanguageSwitcher /> : null} */}
 
           <AuthorizedMenu />
         </div>

@@ -65,7 +65,7 @@ const UserMessageView = ({
   const { t } = useTranslation();
   const { width } = useWindowSize();
   const [visible, setVisible] = useState(false);
-  const { data, isLoading: meLoading, error: meError } = useMeQuery();
+  // const { data, isLoading: meLoading, error: meError } = useMeQuery();
   const messagesEndRef = useRef(null);
   const { permissions } = getAuthCredentials();
   let permission = hasAccess(adminOnly, permissions);
@@ -121,16 +121,16 @@ const UserMessageView = ({
     };
   }, [loading]);
 
-  if (loading || meLoading)
-    return (
-      <Loader className="!h-full flex-1" text={t('common:text-loading')} />
-    );
-  if (meError)
-    return (
-      <div className="!h-full flex-1">
-        <ErrorMessage message={meError?.message} />
-      </div>
-    );
+  // if (loading || meLoading)
+  //   return (
+  //     <Loader className="!h-full flex-1" text={t('common:text-loading')} />
+  //   );
+  // if (meError)
+  //   return (
+  //     <div className="!h-full flex-1">
+  //       <ErrorMessage message={meError?.message} />
+  //     </div>
+  //   );
   return (
     <>
       <div
@@ -171,10 +171,11 @@ const UserMessageView = ({
               <div className="space-y-6">
                 {messages?.map((item: Message, key: number) => {
                   const { body, created_at, user_id, conversation } = item;
-                  const checkUser = Number(data?.id) === Number(user_id);
+                  const checkUser = true;
+                  // const checkUser = Number(data?.id) === Number(user_id);
                   let avatarUrl = !permission
                     ? conversation?.user?.profile?.avatar?.original
-                    : item?.conversation?.shop?.logo?.original;
+                    : item?.conversation?.shop?.logo;
                   return (
                     <div
                       className={`flex w-full gap-x-3 ${

@@ -6,12 +6,18 @@ import {
   adminOnly,
   adminOwnerAndStaffOnly,
   getAuthCredentials,
+  getUserAuthData,
   hasAccess,
 } from '@/utils/auth-utils';
 import { Routes } from '@/config/routes';
 import { useShopQuery } from '@/data/shop';
 import { useMeQuery } from '@/data/user';
 import { useRouter } from 'next/router';
+import { useAuth } from '@/hooks/useAuth';
+import { useQuery } from 'react-query';
+import { getShopDetailsFn } from '@/services/shop';
+import { useMemo } from 'react';
+import { GetShopDetailsTypeForOwner } from '@/types/shops';
 
 export default function CreateProductPage() {
   const { t } = useTranslation();
@@ -19,19 +25,28 @@ export default function CreateProductPage() {
   const {
     query: { shop },
   } = useRouter();
-  const { permissions } = getAuthCredentials();
-  const { data: me } = useMeQuery();
-  const { data: shopData } = useShopQuery({
-    slug: shop as string,
-  });
-  const shopId = shopData?.id!;
-  if (
-    !hasAccess(adminOnly, permissions) &&
-    !me?.shops?.map((shop) => shop.id).includes(shopId) &&
-    me?.managed_shop?.id != shopId
-  ) {
+  // const { permissions } = getAuthCredentials();
+  // const { data: me } = useMeQuery();
+  const userAuthData = getUserAuthData();
+  // const { user, isLoading } = useAuth();
+  // const { data: shopData } = useShopQuery({
+  //   slug: shop as string,
+  // });
+  // const shopId = shopData?.id!;
+  if (!userAuthData?.permissions?.products.includes('create-product')) {
     router.replace(Routes.dashboard);
   }
+
+  // const getShopQuery = useQuery(['get_shop_detail', shop?.toString()], () => {
+  //   return getShopDetailsFn(shop?.toString() ?? '');
+  // });
+
+  // const shopData = useMemo(() => {
+  //   if (getShopQuery.data?.data) {
+  //     return getShopQuery.data.data as GetShopDetailsTypeForOwner;
+  //   }
+  //   return null;
+  // }, [getShopQuery.isLoading, getShopQuery.data]);
 
   return (
     <>

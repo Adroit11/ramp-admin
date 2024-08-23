@@ -19,9 +19,11 @@ import { useState } from 'react';
 import TitleWithSort from '@/components/ui/title-with-sort';
 import { Routes } from '@/config/routes';
 import LanguageSwitcher from '@/components/ui/lang-action/action';
+import { GetShopProductTypeForOwner } from '@/types/shops';
 
 export type IProps = {
-  products: Product[] | undefined;
+  // products: Product[] | undefined;
+  products: GetShopProductTypeForOwner[];
   paginatorInfo: MappedPaginatorInfo | null;
   onPagination: (current: number) => void;
   onSort: (current: any) => void;
@@ -56,7 +58,9 @@ const ProductList = ({
   const onHeaderClick = (column: string | null) => ({
     onClick: () => {
       onSort((currentSortDirection: SortOrder) =>
-        currentSortDirection === SortOrder.Desc ? SortOrder.Asc : SortOrder.Desc
+        currentSortDirection === SortOrder.Desc
+          ? SortOrder.Asc
+          : SortOrder.Desc,
       );
       onOrder(column!);
 
@@ -94,11 +98,14 @@ const ProductList = ({
       width: 280,
       ellipsis: true,
       onHeaderCell: () => onHeaderClick('name'),
-      render: (name: string, { image, type }: { image: any; type: any }) => (
+      render: (
+        name: string,
+        { image, product_type }: { image: string; product_type: string },
+      ) => (
         <div className="flex items-center">
           <div className="relative aspect-square h-10 w-10 shrink-0 overflow-hidden rounded border border-border-200/80 bg-gray-100 me-2.5">
             <Image
-              src={image?.thumbnail ?? siteSettings.product.placeholder}
+              src={image ?? siteSettings.product.placeholder}
               alt={name}
               fill
               priority={true}
@@ -108,7 +115,7 @@ const ProductList = ({
           <div className="flex flex-col">
             <span className="truncate font-medium">{name}</span>
             <span className="truncate whitespace-nowrap pt-1 pb-0.5 text-[13px] text-body/80">
-              {type?.name}
+              {product_type}
             </span>
           </div>
         </div>
@@ -137,7 +144,7 @@ const ProductList = ({
         <div className="flex items-center font-medium">
           <div className="relative aspect-square h-9 w-9 shrink-0 overflow-hidden rounded-full border border-border-200/80 bg-gray-100 me-2">
             <Image
-              src={shop?.logo?.thumbnail ?? siteSettings.product.placeholder}
+              src={(shop?.logo as string) ?? siteSettings.product.placeholder}
               alt={shop?.name ?? 'Shop Name'}
               fill
               priority={true}
@@ -255,19 +262,21 @@ const ProductList = ({
     },
     {
       title: t('table:table-item-actions'),
-      dataIndex: 'slug',
+      dataIndex: 'uid',
       key: 'actions',
       align: 'right',
       width: 120,
-      render: (slug: string, record: Product) => (
+      render: (uid: string, record: Product) => (
         <LanguageSwitcher
-          slug={slug}
+          slug={uid}
           record={record}
           deleteModalView="DELETE_PRODUCT"
           routes={Routes?.product}
           enablePreviewMode={true}
           isShop={Boolean(shop)}
           shopSlug={(shop as string) ?? ''}
+          approveProductIsActive={record.status === 'publish'}
+          approveProduct
         />
       ),
     },

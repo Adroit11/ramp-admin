@@ -3,7 +3,7 @@ import PaymentSettingsForm from '@/components/settings/payment';
 import SettingsPageHeader from '@/components/settings/settings-page-header';
 import ErrorMessage from '@/components/ui/error-message';
 import Loader from '@/components/ui/loader/loader';
-import { useSettingsQuery } from '@/data/settings';
+// import { useSettingsQuery } from '@/data/settings';
 import { adminOnly } from '@/utils/auth-utils';
 import { Settings } from '@/types';
 import { useTranslation } from 'next-i18next';
@@ -13,17 +13,17 @@ import { useRouter } from 'next/router';
 export default function PaymentSettings() {
   const { t } = useTranslation();
   const { locale } = useRouter();
-  const { settings, loading, error } = useSettingsQuery({
-    language: locale! as string,
-  });
+  // const { settings, loading, error } = useSettingsQuery({
+  //   language: locale! as string,
+  // });
 
-  if (loading) return <Loader text={t('common:text-loading')} />;
-  if (error) return <ErrorMessage message={error.message} />;
+  // if (loading) return <Loader text={t('common:text-loading')} />;
+  // if (error) return <ErrorMessage message={error.message} />;
 
   return (
     <>
       <SettingsPageHeader pageTitle="form:form-title-payment-settings" />
-      <PaymentSettingsForm settings={settings as Settings} />
+      {/* <PaymentSettingsForm settings={settings as Settings} /> */}
     </>
   );
 }

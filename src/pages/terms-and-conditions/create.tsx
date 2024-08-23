@@ -1,5 +1,5 @@
 import Layout from '@/components/layouts/admin';
-import CreateOrUpdateTermsAndConditionsForm from '@/components/terms-and-conditions/terms-and-conditions-form';
+// import CreateOrUpdateTermsAndConditionsForm from '@/components/terms-and-conditions/terms-and-conditions-form';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { adminOnly } from '@/utils/auth-utils';
@@ -13,7 +13,7 @@ export default function CreateTermsAndConditionsPage() {
           {t('text-create-terms-conditions')}
         </h1>
       </div>
-      <CreateOrUpdateTermsAndConditionsForm />
+      {/* <CreateOrUpdateTermsAndConditionsForm /> */}
     </>
   );
 }

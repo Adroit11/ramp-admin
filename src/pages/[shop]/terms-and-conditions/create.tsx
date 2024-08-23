@@ -31,11 +31,11 @@ export default function CreateTermsAndConditionsPage() {
   });
   const shopId = shopData?.id!;
 
-  const { settings, loading } = useSettingsQuery({
-    language: locale as string,
-  });
+  // const { settings, loading } = useSettingsQuery({
+  //   language: locale as string,
+  // });
 
-  if (isLoading || loading) return <Loader text={t('common:text-loading')} />;
+  if (isLoading) return <Loader text={t('common:text-loading')} />;
 
   // if (
   //   !hasAccess(adminOnly, permissions) &&
@@ -47,7 +47,8 @@ export default function CreateTermsAndConditionsPage() {
   let currentUser = 'vendor';
 
   if (currentUser === 'vendor') {
-    const isEnableTermsRoute = settings?.options?.enableTerms;
+    // const isEnableTermsRoute = settings?.options?.enableTerms;
+    const isEnableTermsRoute = false;
     const routePermission = isEnableTermsRoute ? adminAndOwnerOnly : adminOnly;
     const isSuperAdmin = hasAccess(adminOnly, permissions);
     const hasPermission = hasAccess(routePermission, permissions);

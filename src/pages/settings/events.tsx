@@ -15,17 +15,17 @@ import { useRouter } from 'next/router';
 export default function EventsSettings() {
   const { t } = useTranslation();
   const { locale } = useRouter();
-  const { settings, loading, error } = useSettingsQuery({
-    language: locale! as string,
-  });
+  // const { settings, loading, error } = useSettingsQuery({
+  //   language: locale! as string,
+  // });
 
-  if (loading) return <Loader text={t('common:text-loading')} />;
-  if (error) return <ErrorMessage message={error.message} />;
+  // if (loading) return <Loader text={t('common:text-loading')} />;
+  // if (error) return <ErrorMessage message={error.message} />;
 
   return (
     <>
       <SettingsPageHeader pageTitle="form:form-title-events-settings" />
-      <EventsSettingsForm settings={settings as Settings} />
+      {/* <EventsSettingsForm settings={settings as Settings} /> */}
     </>
   );
 }

@@ -1,5 +1,5 @@
 import Layout from '@/components/layouts/admin';
-import AuthorCreateOrUpdateForm from '@/components/author/author-form';
+// import AuthorCreateOrUpdateForm from '@/components/author/author-form';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { adminOnly } from '@/utils/auth-utils';
@@ -14,7 +14,7 @@ export default function CreateAuthorPage() {
           {t('form:form-title-create-author')}
         </h1>
       </div>
-      <AuthorCreateOrUpdateForm />
+      {/* <AuthorCreateOrUpdateForm /> */}
     </>
   );
 }

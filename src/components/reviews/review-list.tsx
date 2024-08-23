@@ -48,7 +48,9 @@ const ReviewList = ({
   const onHeaderClick = (column: string | null) => ({
     onClick: () => {
       onSort((currentSortDirection: SortOrder) =>
-        currentSortDirection === SortOrder.Desc ? SortOrder.Asc : SortOrder.Desc
+        currentSortDirection === SortOrder.Desc
+          ? SortOrder.Asc
+          : SortOrder.Desc,
       );
       onOrder(column!);
 
@@ -96,9 +98,7 @@ const ReviewList = ({
         <div className="flex items-center">
           <div className="relative aspect-square h-14 w-14 shrink-0 overflow-hidden rounded border border-border-200/80 bg-gray-100 me-2.5">
             <Image
-              src={
-                product?.image?.thumbnail ?? siteSettings.product.placeholder
-              }
+              src={product?.image ?? siteSettings.product.placeholder}
               alt={product?.name}
               fill
               priority={true}

@@ -20,6 +20,7 @@ import {
   adminOnly,
   adminOwnerAndStaffOnly,
   getAuthCredentials,
+  getUserAuthData,
   hasAccess,
 } from '@/utils/auth-utils';
 import {
@@ -36,6 +37,13 @@ import { Routes } from '@/config/routes';
 import { useShopQuery } from '@/data/shop';
 import { useMeQuery } from '@/data/user';
 import { useFormatPhoneNumber } from '@/utils/format-phone-number';
+import { useAuth } from '@/hooks/useAuth';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { getOrderDetailFn, updateOrderDetailFn } from '@/services/orders';
+import { useMemo } from 'react';
+import { OrderType } from '@/types/orders';
+import { toast } from 'react-toastify';
+import { convertShopAddres, getErrorMessage } from '@/utils/helpers';
 
 type FormValues = {
   order_status: any;
@@ -44,27 +52,56 @@ export default function OrderDetailsPage() {
   const { t } = useTranslation();
   const { locale, query } = useRouter();
   const router = useRouter();
-  const { permissions } = getAuthCredentials();
-  const { data: me } = useMeQuery();
-  const { data: shopData } = useShopQuery({
-    slug: query?.shop as string,
+  // const { permissions } = getAuthCredentials();
+  // const { data: me } = useMeQuery();
+  const queryClient = useQueryClient();
+  const userAuthData = getUserAuthData();
+  const { user, isLoading } = useAuth();
+
+  const orderQuery = useQuery(['get_order_detail', query.orderId], () => {
+    return getOrderDetailFn(query.orderId as string);
   });
-  const shopId = shopData?.id!;
-  const { alignLeft, alignRight, isRTL } = useIsRTL();
-  const { mutate: updateOrder, isLoading: updating } = useUpdateOrderMutation();
-  const {
-    order,
-    isLoading: loading,
-    error,
-  } = useOrderQuery({ id: query.orderId as string, language: locale! });
-  const { refetch } = useDownloadInvoiceMutation(
-    {
-      order_id: query.orderId as string,
-      language: locale!,
-      isRTL,
+
+  const orderDetail = useMemo(() => {
+    if (orderQuery.data?.data) {
+      return orderQuery.data.data as OrderType;
+    }
+
+    return null;
+  }, [orderQuery.isLoading, orderQuery.data]);
+
+  const updateOrder = useMutation({
+    mutationFn: updateOrderDetailFn,
+    onSuccess: () => {
+      toast.success('Update Successful');
     },
-    { enabled: false }
-  );
+    onError: (err) => {
+      toast.error(getErrorMessage(err));
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries('get_order_detail');
+    },
+  });
+
+  // const { data: shopData } = useShopQuery({
+  //   slug: query?.shop as string,
+  // });
+  // const shopId = shopData?.id!;
+  const { alignLeft, alignRight, isRTL } = useIsRTL();
+  // const { mutate: updateOrder, isLoading: updating } = useUpdateOrderMutation();
+  // const {
+  //   order,
+  //   isLoading: loading,
+  //   error,
+  // } = useOrderQuery({ id: query.orderId as string, language: locale! });
+  // const { refetch } = useDownloadInvoiceMutation(
+  //   {
+  //     order_id: query.orderId as string,
+  //     language: locale!,
+  //     isRTL,
+  //   },
+  //   { enabled: false },
+  // );
 
   const {
     handleSubmit,
@@ -72,58 +109,60 @@ export default function OrderDetailsPage() {
 
     formState: { errors },
   } = useForm<FormValues>({
-    defaultValues: { order_status: order?.order_status ?? '' },
+    defaultValues: { order_status: orderDetail?.order_status ?? '' },
   });
 
-  async function handleDownloadInvoice() {
-    const { data } = await refetch();
+  // async function handleDownloadInvoice() {
+  //   const { data } = await refetch();
 
-    if (data) {
-      const a = document.createElement('a');
-      a.href = data;
-      a.setAttribute('download', 'order-invoice');
-      a.click();
-    }
-  }
+  //   if (data) {
+  //     const a = document.createElement('a');
+  //     a.href = data;
+  //     a.setAttribute('download', 'order-invoice');
+  //     a.click();
+  //   }
+  // }
 
   const ChangeStatus = ({ order_status }: FormValues) => {
-    updateOrder({
-      id: order?.id as string,
+    updateOrder.mutate({
+      uid: orderDetail?.uid ?? '',
       order_status: order_status?.status as string,
     });
   };
   const { price: subtotal } = usePrice(
-    order && {
-      amount: order?.amount!,
-    }
+    orderDetail && {
+      amount: orderDetail?.amount!,
+    },
   );
   const { price: total } = usePrice(
-    order && {
-      amount: order?.paid_total!,
-    }
+    orderDetail && {
+      amount: orderDetail?.total,
+    },
   );
-  const { price: discount } = usePrice(
-    order && {
-      amount: order?.discount!,
-    }
-  );
-  const { price: delivery_fee } = usePrice(
-    order && {
-      amount: order?.delivery_fee!,
-    }
-  );
-  const { price: sales_tax } = usePrice(
-    order && {
-      amount: order?.sales_tax!,
-    }
-  );
+  // const { price: discount } = usePrice(
+  //   orderDetail && {
+  //     amount: orderDetail?. .discount!,
+  //   },
+  // );
+  // const { price: delivery_fee } = usePrice(
+  //   order && {
+  //     amount: order?.delivery_fee!,
+  //   },
+  // );
+  // const { price: sales_tax } = usePrice(
+  //   order && {
+  //     amount: order?.sales_tax!,
+  //   },
+  // );
 
-  const phoneNumber = useFormatPhoneNumber({
-    customer_contact: order?.customer_contact as string,
-  });
+  // const phoneNumber = useFormatPhoneNumber({
+  //   customer_contact: order?.customer_contact as string,
+  // });
 
-  if (loading) return <Loader text={t('common:text-loading')} />;
-  if (error) return <ErrorMessage message={error.message} />;
+  if (orderQuery.isLoading || isLoading)
+    return <Loader text={t('common:text-loading')} />;
+  if (orderQuery.isError)
+    return <ErrorMessage message={getErrorMessage(orderQuery.error)} />;
 
   const columns = [
     {
@@ -148,31 +187,26 @@ export default function OrderDetailsPage() {
         <div>
           <span>{name}</span>
           <span className="mx-2">x</span>
-          <span className="font-semibold text-heading">
-            {item.pivot.order_quantity}
-          </span>
+          <span className="font-semibold text-heading">{item.quantity}</span>
         </div>
       ),
     },
     {
       title: t('table:table-item-total'),
-      dataIndex: 'pivot',
-      key: 'pivot',
+      dataIndex: 'price',
+      key: 'price',
       align: alignRight,
-      render: function Render(pivot: any) {
+      render: function Render(prices: number, item: any) {
+        // console.log('yyyy', amount);
         const { price } = usePrice({
-          amount: Number(pivot?.subtotal),
+          amount: Number(item.price),
         });
         return <span>{price}</span>;
       },
     },
   ];
 
-  if (
-    !hasAccess(adminOnly, permissions) &&
-    !me?.shops?.map((shop) => shop.id).includes(shopId) &&
-    me?.managed_shop?.id != shopId
-  ) {
+  if (userAuthData?.role !== 'super_admin') {
     router.replace(Routes.dashboard);
   }
 
@@ -180,9 +214,9 @@ export default function OrderDetailsPage() {
     <div>
       <Card>
         <div className="mb-6 -mt-5 -ml-5 -mr-5 md:-mr-8 md:-ml-8 md:-mt-8">
-          <OrderViewHeader order={order} wrapperClassName="px-8 py-4" />
+          <OrderViewHeader order={orderDetail} wrapperClassName="px-8 py-4" />
         </div>
-        <div className="flex w-full">
+        {/* <div className="flex w-full">
           <Button
             onClick={handleDownloadInvoice}
             className="mb-5 bg-blue-500 ltr:ml-auto rtl:mr-auto"
@@ -190,18 +224,18 @@ export default function OrderDetailsPage() {
             <DownloadIcon className="h-4 w-4 me-3" />
             {t('common:text-download')} {t('common:text-invoice')}
           </Button>
-        </div>
+        </div> */}
 
         <div className="flex flex-col items-center lg:flex-row">
           <h3 className="mb-8 w-full whitespace-nowrap text-center text-2xl font-semibold text-heading lg:mb-0 lg:w-1/3 lg:text-start">
-            {t('form:input-label-order-id')} - {order?.tracking_number}
+            {t('form:input-label-order-id')} - {orderDetail?.tracking_number}
           </h3>
 
           {![
             OrderStatus.FAILED,
             OrderStatus.CANCELLED,
             OrderStatus.REFUNDED,
-          ].includes(order?.order_status! as OrderStatus) && (
+          ].includes(orderDetail?.order_status! as OrderStatus) && (
             <form
               onSubmit={handleSubmit(ChangeStatus)}
               className="flex w-full items-start ms-auto lg:w-2/4"
@@ -213,11 +247,14 @@ export default function OrderDetailsPage() {
                   getOptionLabel={(option: any) => t(option.name)}
                   getOptionValue={(option: any) => option.status}
                   options={ORDER_STATUS.slice(0, 6)}
-                  placeholder={t(`text-${order?.order_status}`) ?? t('form:input-placeholder-order-status')}
+                  placeholder={
+                    t(`text-${orderDetail?.order_status}`) ??
+                    t('form:input-placeholder-order-status')
+                  }
                 />
                 <ValidationError message={t(errors?.order_status?.message)} />
               </div>
-              <Button loading={updating}>
+              <Button loading={updateOrder.isLoading}>
                 <span className="hidden sm:block">
                   {t('form:button-label-change-status')}
                 </span>
@@ -231,13 +268,13 @@ export default function OrderDetailsPage() {
 
         <div className="my-5 flex items-center justify-center lg:my-10">
           <OrderStatusProgressBox
-            orderStatus={order?.order_status as OrderStatus}
-            paymentStatus={order?.payment_status as PaymentStatus}
+            orderStatus={orderDetail?.order_status as OrderStatus}
+            paymentStatus={orderDetail?.payment_status as PaymentStatus}
           />
         </div>
 
         <div className="mb-10">
-          {order ? (
+          {orderDetail ? (
             <Table
               //@ts-ignore
               columns={columns}
@@ -253,7 +290,7 @@ export default function OrderDetailsPage() {
                 </div>
               )}
               //@ts-ignore
-              data={order?.products!}
+              data={orderDetail?.products!}
               rowKey="id"
               scroll={{ x: 300 }}
             />
@@ -266,7 +303,7 @@ export default function OrderDetailsPage() {
               <span>{t('common:order-sub-total')}</span>
               <span>{subtotal}</span>
             </div>
-            <div className="flex items-center justify-between text-sm text-body">
+            {/* <div className="flex items-center justify-between text-sm text-body">
               <span>{t('common:order-tax')}</span>
               <span>{sales_tax}</span>
             </div>
@@ -277,7 +314,7 @@ export default function OrderDetailsPage() {
             <div className="flex items-center justify-between text-sm text-body">
               <span>{t('common:order-discount')}</span>
               <span>{discount}</span>
-            </div>
+            </div> */}
             <div className="flex items-center justify-between font-semibold text-body">
               <span>{t('common:order-total')}</span>
               <span>{total}</span>
@@ -286,33 +323,36 @@ export default function OrderDetailsPage() {
         </div>
 
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between">
-          <div className="mb-10 w-full sm:mb-0 sm:w-1/2 sm:pe-8">
+          <div className="mb-10 w-full sm:mb-0  sm:pe-8">
             <h3 className="mb-3 border-b border-border-200 pb-2 font-semibold text-heading">
               {t('common:billing-address')}
             </h3>
 
             <div className="flex flex-col items-start space-y-1 text-sm text-body">
-              <span>{order?.customer?.name}</span>
-              {order?.billing_address && (
-                <span>{formatAddress(order.billing_address)}</span>
+              {/* @ts-ignore */}
+              <span>{orderDetail?.customer?.name ?? '--'}</span>
+              {orderDetail?.billing_address && (
+                <span>{convertShopAddres(orderDetail.billing_address)}</span>
               )}
-              {order?.customer_contact && <span>{phoneNumber}</span>}
+              {/* {order?.customer_contact && <span>{phoneNumber}</span>} */}
             </div>
           </div>
 
-          <div className="w-full sm:w-1/2 sm:ps-8">
+          {/* <div className="w-full sm:w-1/2 sm:ps-8">
             <h3 className="mb-3 border-b border-border-200 pb-2 font-semibold text-heading text-start sm:text-end">
               {t('common:shipping-address')}
             </h3>
 
             <div className="flex flex-col items-start space-y-1 text-sm text-body text-start sm:items-end sm:text-end">
-              <span>{order?.customer?.name}</span>
-              {order?.shipping_address && (
-                <span>{formatAddress(order.shipping_address)}</span>
-              )}
-              {order?.customer_contact && <span>{phoneNumber}</span>}
+              {/* @ts-ignore 
+              <span>{orderDetail?.customer?.name}</span>
+              {/* {orderDetail?.shipping_address && (
+                // 
+                <span>{formatAddress(orderDetail.shipping_address)}</span>
+              )} 
+              {/* {order?.customer_contact && <span>{phoneNumber}</span>} 
             </div>
-          </div>
+          </div> */}
         </div>
       </Card>
     </div>

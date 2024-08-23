@@ -1,5 +1,5 @@
 import Layout from '@/components/layouts/admin';
-import ManufacturerCreateOrUpdateForm from '@/components/manufacturer/manufacturer-form';
+// import ManufacturerCreateOrUpdateForm from '@/components/manufacturer/manufacturer-form';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { adminOnly } from '@/utils/auth-utils';
@@ -13,7 +13,7 @@ export default function CreateManufacturerPage() {
           {t('form:form-title-create-manufacturer')}
         </h1>
       </div>
-      <ManufacturerCreateOrUpdateForm />
+      {/* <ManufacturerCreateOrUpdateForm /> */}
     </>
   );
 }

@@ -53,9 +53,9 @@ const OwnerStoreNoticePage = () => {
     language: locale as string,
   });
 
-  const { settings, loading: settingsLoading } = useSettingsQuery({
-    language: locale!,
-  });
+  // const { settings, loading: settingsLoading } = useSettingsQuery({
+  //   language: locale!,
+  // });
 
   if (loading) return <Loader text={t('common:text-loading')} />;
   if (error) return <ErrorMessage message={error.message} />;
@@ -67,7 +67,7 @@ const OwnerStoreNoticePage = () => {
 
   if (
     !hasAccess(adminOnly, permissions) &&
-    !me?.shops?.map((shop) => shop.id).includes(shopId) &&
+    // !me?.shops?.map((shop) => shop.id).includes(shopId) &&
     me?.managed_shop?.id != shopId
   ) {
     router.replace(Routes.dashboard);
@@ -109,7 +109,7 @@ const OwnerStoreNoticePage = () => {
                     StoreNoticePriorityType.Medium === data?.priority,
                   'bg-[#F75159] text-[#F75159]':
                     StoreNoticePriorityType.Low === data?.priority,
-                }
+                },
               )}
             />
           </div>
@@ -144,7 +144,7 @@ const OwnerStoreNoticePage = () => {
         ''
       )}
 
-      {!settingsLoading &&
+      {/* {!settingsLoading &&
       !isEmpty(settings?.options?.contactDetails?.socials) ? (
         <div className="mt-10 flex items-center gap-4 lg:mt-20">
           <i className="text-base font-medium leading-8 text-base-dark">
@@ -169,13 +169,13 @@ const OwnerStoreNoticePage = () => {
                 ) : (
                   ''
                 );
-              }
+              },
             )}
           </ul>
         </div>
       ) : (
         ''
-      )}
+      )} */}
     </div>
   );
 };

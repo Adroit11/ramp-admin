@@ -10,9 +10,9 @@ import EmailUpdateForm from '@/components/auth/email-update-form';
 
 export default function ProfilePage() {
   const { t } = useTranslation();
-  const { data, isLoading: loading, error } = useMeQuery();
-  if (loading) return <Loader text={t('common:text-loading')} />;
-  if (error) return <ErrorMessage message={error.message} />;
+  // const { data, isLoading: loading, error } = useMeQuery();
+  // if (loading) return <Loader text={t('common:text-loading')} />;
+  // if (error) return <ErrorMessage message={error.message} />;
   return (
     <>
       <div className="flex border-b border-dashed border-border-base pb-5 md:pb-7">
@@ -20,9 +20,9 @@ export default function ProfilePage() {
           {t('form:form-title-profile-settings')}
         </h1>
       </div>
-      <EmailUpdateForm me={data} />
+      {/* <EmailUpdateForm me={data} />
 
-      <ProfileUpdateFrom me={data} />
+      <ProfileUpdateFrom me={data} /> */}
       <ChangePasswordForm />
     </>
   );

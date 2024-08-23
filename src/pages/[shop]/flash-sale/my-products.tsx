@@ -53,7 +53,7 @@ export default function VendorFlashSalePage() {
     },
     {
       enabled: Boolean(shop_id),
-    }
+    },
   );
 
   if (loading) return <Loader text={t('common:text-loading')} />;
@@ -69,7 +69,7 @@ export default function VendorFlashSalePage() {
 
   if (
     !hasAccess(adminOnly, permissions) &&
-    !me?.shops?.map((shop) => shop.id).includes(shop_id) &&
+    // !me?.shops?.map((shop) => shop.id).includes(shop_id) &&
     me?.managed_shop?.id != shop_id
   ) {
     router.replace(Routes.dashboard);

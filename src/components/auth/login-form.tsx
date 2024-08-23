@@ -10,12 +10,17 @@ import { useLogin } from '@/data/user';
 import type { LoginInput } from '@/types';
 import { useState } from 'react';
 import Alert from '@/components/ui/alert';
-import Router from 'next/router';
+import Router, { useRouter } from 'next/router';
 import {
   allowedRoles,
   hasAccess,
   setAuthCredentials,
+  setUserAuthData,
 } from '@/utils/auth-utils';
+import { useMutation } from 'react-query';
+import { loginFn } from '@/services/auth';
+import { UserAuthType } from '@/types/auth';
+import { getErrorMessage } from '@/utils/helpers';
 
 const loginFormSchema = yup.object().shape({
   email: yup
@@ -24,38 +29,59 @@ const loginFormSchema = yup.object().shape({
     .required('form:error-email-required'),
   password: yup.string().required('form:error-password-required'),
 });
-const defaultValues = {
-  email: "admin@demo.com",
-  password: "demodemo",
-};
+// const defaultValues = {
+//   email: 'admin@demo.com',
+//   password: 'demodemo',
+// };
 
 const LoginForm = () => {
+  const router = useRouter();
   const { t } = useTranslation();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const { mutate: login, isLoading, error } = useLogin();
+  // const { mutate: login, isLoading, error } = useLogin();
+
+  // function onSubmit({ email, password }: LoginInput) {
+  //   login(
+  //     {
+  //       email,
+  //       password,
+  //     },
+  //     {
+  //       onSuccess: (data) => {
+  //         if (data?.token) {
+  //           if (hasAccess(allowedRoles, data?.permissions)) {
+  //             setAuthCredentials(data?.token, data?.permissions, data?.role);
+  //             Router.push(Routes.dashboard);
+  //             return;
+  //           }
+  //           setErrorMessage('form:error-enough-permission');
+  //         } else {
+  //           setErrorMessage('form:error-credential-wrong');
+  //         }
+  //       },
+  //       onError: () => {},
+  //     },
+  //   );
+  // }
+
+  const handleLogin = useMutation({
+    mutationFn: loginFn,
+    onSuccess: (data) => {
+      // console.log('for login', data);
+      const userData = data?.data as UserAuthType;
+
+      if (userData) {
+        setUserAuthData(userData);
+        router.push(Routes.dashboard);
+      }
+    },
+    onError: (err) => {
+      setErrorMessage(getErrorMessage(err));
+    },
+  });
 
   function onSubmit({ email, password }: LoginInput) {
-    login(
-      {
-        email,
-        password,
-      },
-      {
-        onSuccess: (data) => {
-          if (data?.token) {
-            if (hasAccess(allowedRoles, data?.permissions)) {
-              setAuthCredentials(data?.token, data?.permissions, data?.role);
-              Router.push(Routes.dashboard);
-              return;
-            }
-            setErrorMessage('form:error-enough-permission');
-          } else {
-            setErrorMessage('form:error-credential-wrong');
-          }
-        },
-        onError: () => {},
-      }
-    );
+    handleLogin.mutate({ email, password });
   }
 
   return (
@@ -63,7 +89,7 @@ const LoginForm = () => {
       <Form<LoginInput>
         validationSchema={loginFormSchema}
         onSubmit={onSubmit}
-        useFormProps={{ defaultValues }}
+        // useFormProps={{ defaultValues }}
       >
         {({ register, formState: { errors } }) => (
           <>
@@ -84,7 +110,11 @@ const LoginForm = () => {
               className="mb-4"
               forgotPageLink={Routes.forgotPassword}
             />
-            <Button className="w-full" loading={isLoading} disabled={isLoading}>
+            <Button
+              className="w-full"
+              loading={handleLogin.isLoading}
+              disabled={handleLogin.isLoading}
+            >
               {t('form:button-label-login')}
             </Button>
 

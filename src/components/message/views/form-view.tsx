@@ -84,7 +84,7 @@ const CreateMessageForm = ({ className, shop, ...rest }: Props) => {
           });
           reset();
         },
-      }
+      },
     );
   };
   useEffect(() => {
@@ -98,7 +98,7 @@ const CreateMessageForm = ({ className, shop, ...rest }: Props) => {
             <Avatar
               src={
                 !permission
-                  ? shop?.shop?.logo?.original
+                  ? shop?.shop?.logo
                   : shop?.user?.profile?.avatar?.original
               }
               {...rest}
@@ -111,11 +111,11 @@ const CreateMessageForm = ({ className, shop, ...rest }: Props) => {
                 'relative h-full w-full border-0',
                 (
                   !permission
-                    ? shop?.shop?.logo?.original
+                    ? shop?.shop?.logo
                     : shop?.user?.profile?.avatar?.original
                 )
                   ? ''
-                  : 'bg-muted-black text-base font-medium text-white'
+                  : 'bg-muted-black text-base font-medium text-white',
               )}
             />
           </div>

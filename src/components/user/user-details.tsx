@@ -16,45 +16,47 @@ import { miniSidebarInitialValue } from '@/utils/constants';
 import { useAtom } from 'jotai';
 import { useWindowSize } from '@/utils/use-window-size';
 import { RESPONSIVE_WIDTH } from '@/utils/constants';
+import { useAuth } from '@/hooks/useAuth';
 
 const UserDetails: React.FC = () => {
   const { t } = useTranslation('common');
-  const { data, isLoading: loading } = useMeQuery();
-  const phoneNumber = useFormatPhoneNumber({
-    customer_contact: data?.profile?.contact as string,
-  });
+  // const { data, isLoading: loading } = useMeQuery();
+  const { user, isLoading: isFetchingUser } = useAuth();
+  // const phoneNumber = useFormatPhoneNumber({
+  //   customer_contact: data?.profile?.contact as string,
+  // });
   const [miniSidebar, _] = useAtom(miniSidebarInitialValue);
   const { width } = useWindowSize();
 
-  if (loading)
+  if (isFetchingUser)
     return <Loader text={t('text-loading')} className="!h-auto py-10" />;
 
   return (
     <div
       className={classNames(
         'relative mt-11 pb-10',
-        miniSidebar && width >= RESPONSIVE_WIDTH ? 'px-4' : 'px-8'
+        miniSidebar && width >= RESPONSIVE_WIDTH ? 'px-4' : 'px-8',
       )}
     >
       <div className="flex flex-wrap gap-3">
         <div
           className={classNames(
             'relative h-12 w-12 shrink-0 rounded-full',
-            data?.profile?.avatar?.original
-              ? ''
-              : 'flex bg-[#2B2C2E] text-[#F0F0F0]',
-            miniSidebar && width >= RESPONSIVE_WIDTH ? 'm-auto' : ''
+            // data?.profile?.avatar?.original
+            //   ? ''
+            'flex bg-[#2B2C2E] text-[#F0F0F0]',
+            miniSidebar && width >= RESPONSIVE_WIDTH ? 'm-auto' : '',
           )}
         >
           <div
             className={classNames(
               'relative overflow-hidden',
-              data?.profile?.avatar?.original
-                ? 'h-full w-full'
-                : 'mx-auto self-end'
+              // data?.profile?.avatar?.original
+              //   ? 'h-full w-full'
+              'mx-auto self-end',
             )}
           >
-            {data?.profile?.avatar?.original ? (
+            {/* {data?.profile?.avatar?.original ? (
               <Image
                 src={data?.profile?.avatar?.original}
                 // fill
@@ -64,15 +66,15 @@ const UserDetails: React.FC = () => {
                 width={36}
                 className="h-full w-full rounded-full object-cover"
               />
-            ) : (
-              <AvatarIcon className="-mb-px" />
-            )}
+            ) : ( */}
+            <AvatarIcon className="-mb-px" />
+            {/* )} */}
           </div>
 
           <div
             className={classNames(
               'absolute top-0 -right-0.5 text-base',
-              data?.is_active ? 'text-accent' : 'text-red-500'
+              user?.is_active ? 'text-accent' : 'text-red-500',
             )}
           >
             <CheckMarkFillNew />
@@ -88,21 +90,21 @@ const UserDetails: React.FC = () => {
         ) : (
           <>
             <div className="flex-1 self-center">
-              {data?.name ? (
+              {user?.name ? (
                 <h3 className="mb-1.5 break-all text-xl font-semibold leading-none text-muted-black">
-                  {data?.name}
+                  {user?.name}
                 </h3>
               ) : (
                 ''
               )}
-              {data?.email ? (
+              {user?.email ? (
                 <div className="flex items-start gap-1 ">
                   <EmailIcon className="shrink-0 text-base text-[#E5E5E5]" />
                   <Link
-                    href={`mailTo:${data?.email}`}
+                    href={`mailTo:${user?.email}`}
                     className="break-all text-xs font-normal text-gray-500"
                   >
-                    {data?.email}
+                    {user?.email}
                   </Link>
                 </div>
               ) : (
@@ -116,7 +118,7 @@ const UserDetails: React.FC = () => {
         ''
       ) : (
         <>
-          {!data?.profile ? (
+          {!user ? (
             <p className="mt-4 text-sm text-muted">
               {t('text-add-your')}{' '}
               <Link
@@ -128,16 +130,16 @@ const UserDetails: React.FC = () => {
             </p>
           ) : (
             <>
-              {data?.profile?.bio ? (
+              {/* {data?.profile?.bio ? (
                 <BlockQuote
                   quote={data?.profile?.bio as string}
                   className="mt-4"
                 />
               ) : (
                 ''
-              )}
+              )} */}
 
-              {data?.profile?.contact ? (
+              {/* {data?.profile?.contact ? (
                 <p className="mt-4 flex items-center gap-2 text-sm text-muted-black">
                   <span className="inline-flex items-center gap-1 font-semibold">
                     <PhoneOutlineIcon className="text-lg text-[#E5E5E5]" />
@@ -147,7 +149,7 @@ const UserDetails: React.FC = () => {
                 </p>
               ) : (
                 ''
-              )}
+              )} */}
             </>
           )}
           <div className="absolute -left-8 bottom-0 h-px w-[calc(100%+64px)] border-b border-dashed border-b-[#E5E5E5]"></div>

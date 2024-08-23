@@ -1,8 +1,8 @@
 import AdminLayout from '@/components/layouts/admin';
-import GeneralSettingsForm from '@/components/settings/general';
-import ErrorMessage from '@/components/ui/error-message';
-import Loader from '@/components/ui/loader/loader';
-import { useSettingsQuery } from '@/data/settings';
+// import GeneralSettingsForm from '@/components/settings/general';
+// import ErrorMessage from '@/components/ui/error-message';
+// import Loader from '@/components/ui/loader/loader';
+// import { useSettingsQuery } from '@/data/settings';
 import { useShippingClassesQuery } from '@/data/shipping';
 import { useTaxesQuery } from '@/data/tax';
 import { adminOnly } from '@/utils/auth-utils';
@@ -21,23 +21,23 @@ export default function Settings() {
   const { shippingClasses, loading: shippingLoading } =
     useShippingClassesQuery();
 
-  const { settings, loading, error } = useSettingsQuery({
-    language: locale!,
-  });
+  // const { settings, loading, error } = useSettingsQuery({
+  //   language: locale!,
+  // });
 
-  if (loading || shippingLoading || taxLoading)
-    return <Loader text={t('common:text-loading')} />;
-  if (error) return <ErrorMessage message={error.message} />;
+  // if (loading || shippingLoading || taxLoading)
+  //   return <Loader text={t('common:text-loading')} />;
+  // if (error) return <ErrorMessage message={error.message} />;
 
   return (
     <>
       <SettingsPageHeader pageTitle="form:form-title-settings" />
-      <GeneralSettingsForm
+      {/* <GeneralSettingsForm
         // @ts-ignore
         settings={settings}
         taxClasses={taxes}
         // shippingClasses={shippingClasses}
-      />
+      /> */}
     </>
   );
 }

@@ -40,7 +40,7 @@ export default function CreateOrUpdateFaqsForm({ initialValues }: IProps) {
   const router = useRouter();
   const { t } = useTranslation();
   const { permissions } = getAuthCredentials();
-  const { data: user, isLoading: loading, error } = useMeQuery();
+  // const { data: user, isLoading: loading, error } = useMeQuery();
   const { locale } = router;
   const {
     // @ts-ignore
@@ -54,7 +54,7 @@ export default function CreateOrUpdateFaqsForm({ initialValues }: IProps) {
     { slug: router.query.shop as string },
     {
       enabled: !!router.query.shop,
-    }
+    },
   );
   const shopId = shopData?.id!;
 

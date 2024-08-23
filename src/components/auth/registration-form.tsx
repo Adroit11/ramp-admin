@@ -17,6 +17,9 @@ import {
 } from '@/utils/auth-utils';
 import { Permission } from '@/types';
 import { useRegisterMutation } from '@/data/user';
+import { useMutation } from 'react-query';
+import { registerFn } from '@/services/auth';
+import { getErrorMessage } from '@/utils/helpers';
 
 type FormValues = {
   name: string;
@@ -35,7 +38,7 @@ const registrationFormSchema = yup.object().shape({
 });
 const RegistrationForm = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const { mutate: registerUser, isLoading: loading } = useRegisterMutation();
+  // const { mutate: registerUser, isLoading: loading } = useRegisterMutation();
 
   const {
     register,
@@ -51,39 +54,50 @@ const RegistrationForm = () => {
   const router = useRouter();
   const { t } = useTranslation();
 
-  async function onSubmit({ name, email, password, permission }: FormValues) {
-    registerUser(
-      {
-        name,
-        email,
-        password,
-        //@ts-ignore
-        permission,
-      },
+  const handleSignup = useMutation({
+    mutationFn: registerFn,
+    onSuccess: () => {
+      router.push(Routes.login);
+    },
+    onError: (err) => {
+      setErrorMessage(getErrorMessage(err));
+    },
+  });
 
-      {
-        onSuccess: (data) => {
-          if (data?.token) {
-            if (hasAccess(allowedRoles, data?.permissions)) {
-              setAuthCredentials(data?.token, data?.permissions, data?.role);
-              router.push(Routes.dashboard);
-              return;
-            }
-            setErrorMessage('form:error-enough-permission');
-          } else {
-            setErrorMessage('form:error-credential-wrong');
-          }
-        },
-        onError: (error: any) => {
-          Object.keys(error?.response?.data).forEach((field: any) => {
-            setError(field, {
-              type: 'manual',
-              message: error?.response?.data[field],
-            });
-          });
-        },
-      },
-    );
+  async function onSubmit({ name, email, password, permission }: FormValues) {
+    handleSignup.mutate({ name, email, password });
+    // registerUser(
+    //   {
+    //     name,
+    //     email,
+    //     password,
+    //     //@ts-ignore
+    //     permission,
+    //   },
+
+    //   {
+    //     onSuccess: (data) => {
+    //       if (data?.token) {
+    //         if (hasAccess(allowedRoles, data?.permissions)) {
+    //           setAuthCredentials(data?.token, data?.permissions, data?.role);
+    //           router.push(Routes.dashboard);
+    //           return;
+    //         }
+    //         setErrorMessage('form:error-enough-permission');
+    //       } else {
+    //         setErrorMessage('form:error-credential-wrong');
+    //       }
+    //     },
+    //     onError: (error: any) => {
+    //       Object.keys(error?.response?.data).forEach((field: any) => {
+    //         setError(field, {
+    //           type: 'manual',
+    //           message: error?.response?.data[field],
+    //         });
+    //       });
+    //     },
+    //   },
+    // );
   }
 
   return (
@@ -117,7 +131,11 @@ const RegistrationForm = () => {
           variant="outline"
           className="mb-4"
         />
-        <Button className="w-full" loading={loading} disabled={loading}>
+        <Button
+          className="w-full"
+          loading={handleSignup.isLoading}
+          disabled={handleSignup.isLoading}
+        >
           {t('form:text-register')}
         </Button>
 
@@ -125,6 +143,15 @@ const RegistrationForm = () => {
           <Alert
             message={t(errorMessage)}
             variant="error"
+            closeable={true}
+            className="mt-5"
+            onClose={() => setErrorMessage(null)}
+          />
+        ) : null}
+        {handleSignup.data && handleSignup.isSuccess ? (
+          <Alert
+            message={t('Registration successful')}
+            variant="success"
             closeable={true}
             className="mt-5"
             onClose={() => setErrorMessage(null)}

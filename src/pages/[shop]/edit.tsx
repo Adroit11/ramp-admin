@@ -9,33 +9,52 @@ import {
   adminAndOwnerOnly,
   adminOnly,
   getAuthCredentials,
+  getUserAuthData,
   hasAccess,
 } from '@/utils/auth-utils';
 import { useShopQuery } from '@/data/shop';
 import { Routes } from '@/config/routes';
 import { useMeQuery } from '@/data/user';
+import { useAuth } from '@/hooks/useAuth';
+import { useQuery } from 'react-query';
+import { getShopDetailsFn } from '@/services/shop';
+import { useMemo } from 'react';
+import { GetShopDetailsTypeForOwner } from '@/types/shops';
+import { convertShopAddres, getErrorMessage } from '@/utils/helpers';
 
 export default function UpdateShopPage() {
   const router = useRouter();
-  const { permissions } = getAuthCredentials();
-  const { data: me } = useMeQuery();
+  const userAuthData = getUserAuthData();
+  const { user, isLoading } = useAuth();
+  // const { permissions } = getAuthCredentials();
+  // const { data: me } = useMeQuery();
   const { query } = useRouter();
   const { shop } = query;
   const { t } = useTranslation();
-  const {
-    data,
-    isLoading: loading,
-    error,
-  } = useShopQuery({
-    slug: shop as string,
+  // const {
+  //   data,
+  //   isLoading: loading,
+  //   error,
+  // } = useShopQuery({
+  //   slug: shop as string,
+  // });
+
+  const getShopQuery = useQuery(['get_shop_detail', shop?.toString()], () => {
+    return getShopDetailsFn(shop?.toString() ?? '');
   });
-  if (loading) return <Loader text={t('common:text-loading')} />;
-  if (error) return <ErrorMessage message={error.message} />;
-  if (
-    !hasAccess(adminOnly, permissions) &&
-    !me?.shops?.map((shop) => shop.id).includes(data?.id) &&
-    me?.managed_shop?.id != data?.id
-  ) {
+
+  const shopData = useMemo(() => {
+    if (getShopQuery.data?.data) {
+      return getShopQuery.data.data as GetShopDetailsTypeForOwner;
+    }
+    return null;
+  }, [getShopQuery.isLoading, getShopQuery.data]);
+
+  if (isLoading) return <Loader text={t('common:text-loading')} />;
+  if (getShopQuery.isError)
+    return <ErrorMessage message={getErrorMessage(getShopQuery.error)} />;
+
+  if (!userAuthData?.permissions?.shops?.includes('create-shop')) {
     router.replace(Routes.dashboard);
   }
   return (
@@ -45,7 +64,19 @@ export default function UpdateShopPage() {
           {t('form:form-title-edit-shop')}
         </h1>
       </div>
-      <ShopForm initialValues={data} />
+      {shopData ? (
+        <ShopForm
+          initialValues={{
+            name: shopData.name,
+            description: shopData.description,
+            uid: shopData.uid,
+            image: shopData.logo,
+            cover_image: shopData.cover_image,
+            address: Object.values(shopData.address),
+            url: shopData.shop_website_link,
+          }}
+        />
+      ) : null}
     </>
   );
 }

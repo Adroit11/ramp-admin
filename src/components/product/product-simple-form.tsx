@@ -43,35 +43,49 @@ export default function ProductSimpleForm({ initialValues }: IProps) {
       <Card className="w-full sm:w-8/12 md:w-2/3">
         <Input
           label={`${t('form:input-label-price')}*`}
-          {...register('price')}
+          {...register('price', {
+            required: 'Price is required',
+          })}
           type="number"
           error={t(errors.price?.message!)}
           variant="outline"
           className="mb-5"
+          defaultValue={
+            initialValues?.price ? parseFloat(initialValues.price) : undefined
+          }
+          required
         />
-        <Input
+        {/* <Input
           label={t('form:input-label-sale-price')}
           type="number"
           {...register('sale_price')}
           error={t(errors.sale_price?.message!)}
           variant="outline"
           className="mb-5"
-        />
+        /> */}
 
-        {!is_external && (
-          <Input
-            label={`${t('form:input-label-quantity')}*`}
-            type="number"
-            {...register('quantity')}
-            error={t(errors.quantity?.message!)}
-            variant="outline"
-            className="mb-5"
-            // Need discussion
-            disabled={isTranslateProduct}
-          />
-        )}
-
+        {/* {!is_external && ( */}
         <Input
+          label={`${t('form:input-label-quantity')}*`}
+          type="number"
+          {...register('quantity', {
+            required: 'Quantity is required',
+          })}
+          error={t(errors.quantity?.message!)}
+          variant="outline"
+          className="mb-5"
+          defaultValue={
+            initialValues?.quantity
+              ? parseFloat(initialValues.quantity)
+              : undefined
+          }
+          required
+          // Need discussion
+          // disabled={isTranslateProduct}
+        />
+        {/* )} */}
+
+        {/* <Input
           label={`${t('form:input-label-sku')}*`}
           {...register('sku')}
           note={
@@ -83,25 +97,25 @@ export default function ProductSimpleForm({ initialValues }: IProps) {
           variant="outline"
           className="mb-5"
           disabled={isTranslateProduct}
-        />
+        /> */}
 
-        <Input
+        {/* <Input
           label={`${t('form:input-label-preview-url')}`}
           {...register('preview_url')}
           error={t(errors.preview_url?.message!)}
           variant="outline"
           className="mb-5"
-        />
+        /> */}
 
-        <Checkbox
+        {/* <Checkbox
           {...register('is_external')}
           id="is_external"
           label={t('form:input-label-is-external')}
           disabled={Boolean(is_digital)}
           className="mb-5"
-        />
+        /> */}
 
-        {is_digital ? (
+        {/* {is_digital ? (
           <>
             <Label>{t('form:input-label-digital-file')}</Label>
             <FileInput
@@ -130,9 +144,9 @@ export default function ProductSimpleForm({ initialValues }: IProps) {
               )
             }
           </>
-        ) : null}
+        ) : null} */}
 
-        {is_external ? (
+        {/* {is_external ? (
           <div>
             <Input
               label={t('form:input-label-external-product-url')}
@@ -168,7 +182,7 @@ export default function ProductSimpleForm({ initialValues }: IProps) {
               </p>
             )}
           </>
-        )}
+        )} */}
       </Card>
     </div>
   );

@@ -13,17 +13,17 @@ import CompanyInfoForm from '@/components/settings/company-information';
 export default function CompanyInformation() {
   const { t } = useTranslation();
   const { locale } = useRouter();
-  const { settings, loading, error } = useSettingsQuery({
-    language: locale! as string,
-  });
+  // const { settings, loading, error } = useSettingsQuery({
+  //   language: locale! as string,
+  // });
 
-  if (loading) return <Loader text={t('common:text-loading')} />;
-  if (error) return <ErrorMessage message={error.message} />;
+  // if (loading) return <Loader text={t('common:text-loading')} />;
+  // if (error) return <ErrorMessage message={error.message} />;
 
   return (
     <>
       <SettingsPageHeader pageTitle="form:form-title-settings" />
-      <CompanyInfoForm settings={settings as Settings} />
+      {/* <CompanyInfoForm settings={settings as Settings} /> */}
     </>
   );
 }

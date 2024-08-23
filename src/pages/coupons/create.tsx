@@ -1,5 +1,5 @@
 import Layout from '@/components/layouts/admin';
-import CouponCreateOrUpdateForm from '@/components/coupon/coupon-form';
+// import CouponCreateOrUpdateForm from '@/components/coupon/coupon-form';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
@@ -12,7 +12,7 @@ export default function CreateCouponPage() {
           {t('form:form-title-create-coupon')}
         </h1>
       </div>
-      <CouponCreateOrUpdateForm />
+      {/* <CouponCreateOrUpdateForm /> */}
     </>
   );
 }

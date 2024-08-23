@@ -19,7 +19,7 @@ import Badge from '@/components/ui/badge/badge';
 import { ChatIcon } from '@/components/icons/chat';
 import { useCreateConversations } from '@/data/conversations';
 import { SUPER_ADMIN } from '@/utils/constants';
-import { getAuthCredentials } from '@/utils/auth-utils';
+import { getAuthCredentials, getUserAuthData } from '@/utils/auth-utils';
 import Avatar from '../common/avatar';
 
 type IProps = {
@@ -42,7 +42,8 @@ const OrderList = ({
   const { t } = useTranslation();
   const rowExpandable = (record: any) => record.children?.length;
   const { alignLeft, alignRight } = useIsRTL();
-  const { permissions } = getAuthCredentials();
+  // const { permissions } = getAuthCredentials();
+  const userAuthData = getUserAuthData();
   const { mutate: createConversations, isLoading: creating } =
     useCreateConversations();
   const [loading, setLoading] = useState<boolean | string | undefined>(false);
@@ -66,7 +67,9 @@ const OrderList = ({
   const onHeaderClick = (column: string | null) => ({
     onClick: () => {
       onSort((currentSortDirection: SortOrder) =>
-        currentSortDirection === SortOrder.Desc ? SortOrder.Asc : SortOrder.Desc
+        currentSortDirection === SortOrder.Desc
+          ? SortOrder.Asc
+          : SortOrder.Desc,
       );
       onOrder(column!);
 
@@ -206,16 +209,16 @@ const OrderList = ({
     },
     {
       title: t('table:table-item-actions'),
-      dataIndex: 'id',
+      dataIndex: 'uid',
       key: 'actions',
       align: alignRight,
       width: 120,
-      render: (id: string, order: Order) => {
+      render: (uid: string, order: Order) => {
         const currentButtonLoading = !!loading && loading === order?.shop_id;
         return (
           <>
             {/* @ts-ignore */}
-            {order?.children?.length ? (
+            {/* {order?.children?.length ? (
               ''
             ) : (
               <>
@@ -225,18 +228,20 @@ const OrderList = ({
                     disabled={currentButtonLoading}
                     className="cursor-pointer text-accent transition-colors duration-300 me-1.5 hover:text-accent-hover"
                   >
-                    {/* <ChatIcon width="19" height="20" /> */}
+                    {/* <ChatIcon width="19" height="20" /> 
                   </button>
                 ) : (
                   ''
                 )}
               </>
-            )}
-            <ActionButtons
-              id={id}
-              detailsUrl={`${router.asPath}/${id}`}
-              customLocale={order.language}
-            />
+            )} */}
+            {userAuthData?.role === 'super_admin' ? (
+              <ActionButtons
+                id={uid}
+                detailsUrl={`${router.asPath}/${uid}`}
+                customLocale={order.language}
+              />
+            ) : null}
           </>
         );
       },

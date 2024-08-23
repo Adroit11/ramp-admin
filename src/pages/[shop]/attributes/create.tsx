@@ -27,9 +27,10 @@ export default function CreateAttributePage() {
   const shopId = shopData?.id!;
 
   if (
-    !hasAccess(adminOnly, permissions) &&
-    !me?.shops?.map((shop) => shop.id).includes(shopId) &&
-    me?.managed_shop?.id != shopId
+    // !hasAccess(adminOnly, permissions) &&
+    // // !me?.shops?.map((shop) => shop.id).includes(shopId) &&
+    // me?.managed_shop?.id != shopId
+    false
   ) {
     router.replace(Routes.dashboard);
   }

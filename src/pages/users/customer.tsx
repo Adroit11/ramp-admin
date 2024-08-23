@@ -62,7 +62,7 @@ export default function CustomersPage() {
 
       {loading ? null : (
         <CustomerList
-          customers={customers}
+          customers={[]}
           paginatorInfo={paginatorInfo}
           onPagination={handlePagination}
           onOrder={setOrder}

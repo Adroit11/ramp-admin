@@ -42,7 +42,7 @@ const SearchBar: React.FC<IProps> = ({}: IProps) => {
 
   const getAuthorizedURL = (links: any[]): any[] => {
     return [...links].filter((link) =>
-      hasAccess(link?.permissions!, currentUserPermissions)
+      hasAccess(link?.permissions!, currentUserPermissions),
     );
   };
 
@@ -60,14 +60,14 @@ const SearchBar: React.FC<IProps> = ({}: IProps) => {
     const adminLinks = extractHrefObjects(Object.values(admin));
     const shopLinks = extractHrefObjects(Object.values(shopSideLink));
     const ownerDashboardLinks = extractHrefObjects(
-      Object.values(ownerDashboard)
+      Object.values(ownerDashboard),
     );
     let searchAbleLinks = [];
     let flattenShop = [];
 
-    if (hasAccess([STAFF], currentUserPermissions)) {
-      shop = me?.managed_shop?.slug!;
-    }
+    // if (hasAccess([STAFF], currentUserPermissions)) {
+    //   shop = me?.managed_shop?.slug!;
+    // }
 
     switch (true) {
       case !isEmpty(shop): // This execute when user under a shop route
@@ -80,13 +80,13 @@ const SearchBar: React.FC<IProps> = ({}: IProps) => {
         searchAbleLinks = adminLinks;
         break;
 
-      case isEmpty(shop) && hasAccess(ownerOnly, currentUserPermissions): // This execute when user is and vendor but not under a shop route
-        flattenShop = [...ownerDashboardLinks];
-        me?.shops.map((s) =>
-          flattenShop.push(...formatOwnerLinks(shopLinks, s.slug as string))
-        );
-        searchAbleLinks = getAuthorizedURL(flattenShop);
-        break;
+      // case isEmpty(shop) && hasAccess(ownerOnly, currentUserPermissions): // This execute when user is and vendor but not under a shop route
+      //   flattenShop = [...ownerDashboardLinks];
+      //   me?.shops.map((s) =>
+      //     flattenShop.push(...formatOwnerLinks(shopLinks, s.slug as string))
+      //   );
+      //   searchAbleLinks = getAuthorizedURL(flattenShop);
+      //   break;
 
       default:
         searchAbleLinks = getAuthorizedURL(adminLinks);

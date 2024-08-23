@@ -106,7 +106,7 @@ export default function DraftProductPage() {
         </div>
       </Card>
       <ProductList
-        products={products}
+        products={[]}
         paginatorInfo={paginatorInfo}
         onPagination={handlePagination}
         onOrder={setOrder}

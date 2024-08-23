@@ -49,7 +49,7 @@ function PopularProductCard({ product }: { product: Product }) {
         <div className="relative aspect-square h-12 w-12 shrink-0 overflow-hidden rounded-md border border-border-200/60 bg-gray-100">
           <Image
             alt={name}
-            src={image?.thumbnail ?? siteSettings.product.placeholder}
+            src={image ?? siteSettings.product.placeholder}
             fill
             priority={true}
             sizes="(max-width: 768px) 100vw"

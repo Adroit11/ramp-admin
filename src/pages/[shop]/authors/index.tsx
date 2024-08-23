@@ -63,7 +63,7 @@ export default function Authors() {
 
   if (
     !hasAccess(adminOnly, permissions) &&
-    !me?.shops?.map((shop) => shop.id).includes(shop_id) &&
+    // !me?.shops?.map((shop) => shop.id).includes(shop_id) &&
     me?.managed_shop?.id != shop_id
   ) {
     router.replace(Routes.dashboard);

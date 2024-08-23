@@ -1,5 +1,5 @@
 import Layout from '@/components/layouts/admin';
-import CreateOrUpdateRefundPolicyForm from '@/components/refund-policy/refund-policy-form';
+// import CreateOrUpdateRefundPolicyForm from '@/components/refund-policy/refund-policy-form';
 import { adminOnly } from '@/utils/auth-utils';
 import { GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
@@ -14,7 +14,7 @@ export default function CreateRefundPolicyPage() {
           {t('form:form-title-create-refund-policy')}
         </h1>
       </div>
-      <CreateOrUpdateRefundPolicyForm />
+      {/* <CreateOrUpdateRefundPolicyForm /> */}
     </>
   );
 }

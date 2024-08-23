@@ -46,7 +46,7 @@ const ProductCard = ({ item }: Props) => {
       <div className="relative flex items-center justify-center w-auto product-thumbnail">
         <span className="sr-only">{t('text-product-image')}</span>
         <Image
-          src={image?.original ?? productPlaceholder}
+          src={image ?? productPlaceholder}
           alt={name}
           layout="fill"
           objectFit="cover"
@@ -66,7 +66,7 @@ const ProductCard = ({ item }: Props) => {
               width={32}
               height={32}
               alt={shop?.name ?? ''}
-              src={shop?.logo?.thumbnail ?? '/'}
+              src={shop?.logo ?? '/'}
               className="rounded-full"
             />
           </div>

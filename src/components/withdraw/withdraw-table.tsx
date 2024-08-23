@@ -104,7 +104,7 @@ const WithdrawTable = ({
         <div className="flex items-center font-medium">
           <div className="relative aspect-square h-9 w-9 shrink-0 overflow-hidden rounded-full border border-border-200/80 bg-gray-100 me-2">
             <Image
-              src={shop.logo?.thumbnail ?? siteSettings.product.placeholder}
+              src={shop.logo ?? siteSettings.product.placeholder}
               alt={shop?.name ?? 'Shop Name'}
               fill
               priority={true}
@@ -188,7 +188,7 @@ const WithdrawTable = ({
     <div
       className={cn(
         'overflow-hidden rounded-lg bg-white p-6 md:p-7',
-        className
+        className,
       )}
     >
       <div className="mb-7 mt-1.5 flex items-center justify-between">

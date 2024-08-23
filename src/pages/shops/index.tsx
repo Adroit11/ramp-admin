@@ -5,12 +5,15 @@ import Loader from '@/components/ui/loader/loader';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import ShopList from '@/components/shop/shop-list';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Search from '@/components/common/search';
 import { adminOnly } from '@/utils/auth-utils';
 import { useShopsQuery } from '@/data/shop';
 import { SortOrder } from '@/types';
 import PageHeading from '@/components/common/page-heading';
+import { useQuery } from 'react-query';
+import { getShopsFn } from '@/services/shop';
+import { getErrorMessage } from '@/utils/helpers';
 
 export default function AllShopPage() {
   const { t } = useTranslation();
@@ -18,16 +21,29 @@ export default function AllShopPage() {
   const [page, setPage] = useState(1);
   const [orderBy, setOrder] = useState('created_at');
   const [sortedBy, setColumn] = useState<SortOrder>(SortOrder.Desc);
-  const { shops, paginatorInfo, loading, error } = useShopsQuery({
-    name: searchTerm,
-    limit: 10,
-    page,
-    orderBy,
-    sortedBy,
+  // const { shops, paginatorInfo, loading, error } = useShopsQuery({
+  //   name: searchTerm,
+  //   limit: 10,
+  //   page,
+  //   orderBy,
+  //   sortedBy,
+  // });
+
+  const shopsQuery = useQuery(['get_shops'], () => {
+    return getShopsFn();
   });
 
-  if (loading) return <Loader text={t('common:text-loading')} />;
-  if (error) return <ErrorMessage message={error.message} />;
+  const shopsData = useMemo(() => {
+    if (shopsQuery.data?.data) {
+      return shopsQuery.data.data;
+    }
+
+    return null;
+  }, [shopsQuery.isLoading, shopsQuery.data]);
+
+  if (shopsQuery.isLoading) return <Loader text={t('common:text-loading')} />;
+  if (shopsQuery.isError)
+    return <ErrorMessage message={getErrorMessage(shopsQuery.error)} />;
 
   function handleSearch({ searchText }: { searchText: string }) {
     setSearchTerm(searchText);
@@ -51,8 +67,8 @@ export default function AllShopPage() {
         </div>
       </Card>
       <ShopList
-        shops={shops}
-        paginatorInfo={paginatorInfo}
+        shops={shopsData}
+        paginatorInfo={null}
         onPagination={handlePagination}
         onOrder={setOrder}
         onSort={setColumn}
