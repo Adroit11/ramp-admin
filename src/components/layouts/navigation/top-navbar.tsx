@@ -39,6 +39,7 @@ import { useWindowSize } from 'react-use';
 import AuthorizedMenu from './authorized-menu';
 import { useEffect } from 'react';
 import { addDays, eachDayOfInterval, isTomorrow } from 'date-fns';
+import Link from 'next/link';
 
 export const isInArray = (array: Date[], value: Date) => {
   return !!array?.find((item) => {
@@ -174,19 +175,34 @@ const Navbar = () => {
             </button>
           </div>
           <div
-            className="relative ml-auto mr-1.5 flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-gray-200 bg-gray-50 py-4 text-gray-600 hover:border-transparent hover:border-gray-200 hover:bg-white hover:text-accent sm:mr-6 lg:hidden xl:hidden"
-            onClick={handleClick}
+            className="relative ml-auto mr-1.5 flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-gray-200 bg-gray-50 py-4 text-gray-600 hover:border-transparent hover:border-gray-200 hover:bg-white hover:text-accent sm:mr-6 lg:hidden"
+            // onClick={handleClick}
+            title="Create a Shop"
           >
-            <SearchIcon className="h-4 w-4" />
+            {/* <SearchIcon className="h-4 w-4" /> */}
+            <Link href={Routes.shop.create}>
+              <svg
+                className="text-accent text-[18px]"
+                stroke="currentColor"
+                fill="currentColor"
+                strokeWidth="0"
+                viewBox="0 0 16 16"
+                height="1em"
+                width="1em"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0m7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0M9 5.5V7h1.5a.5.5 0 0 1 0 1H9v1.5a.5.5 0 0 1-1 0V8H6.5a.5.5 0 0 1 0-1H8V5.5a.5.5 0 0 1 1 0"></path>
+              </svg>
+            </Link>
           </div>
-          <div className="relative hidden w-full max-w-[710px] py-4 me-6 lg:block 2xl:me-auto">
+          {/* <div className="relative hidden w-full max-w-[710px] py-4 me-6 lg:block 2xl:me-auto">
             <SearchBar />
-          </div>
+          </div> */}
 
-          <div className="flex shrink-0 grow-0 basis-auto items-center">
+          <div className="lg:ml-auto flex shrink-0 grow-0 basis-auto items-center">
             {isStoreOwner() && (
               <>
-                <div className="hidden border-gray-200/80 px-6 py-5 border-e 2xl:block">
+                <div className="hidden border-gray-200/80 px-6 py-5 border-e lg:block">
                   <LinkButton
                     href={Routes.shop.create}
                     size="small"
@@ -196,9 +212,9 @@ const Navbar = () => {
                   </LinkButton>
                 </div>
 
-                <div className="hidden px-6 py-5 2xl:block">
+                {/* <div className="hidden px-6 py-5 2xl:block">
                   <VisitStore />
-                </div>
+                </div> */}
 
                 {/* {options?.pushNotification?.all?.order ||
                 options?.pushNotification?.all?.message ||

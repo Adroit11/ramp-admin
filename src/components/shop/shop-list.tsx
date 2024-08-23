@@ -101,58 +101,58 @@ const ShopList = ({
       ),
     },
 
-    {
-      title: (
-        <TitleWithSort
-          title={t('table:table-item-total-products')}
-          ascending={
-            sortingObj.sort === SortOrder.Asc &&
-            sortingObj.column === 'products_count'
-          }
-          isActive={sortingObj.column === 'products_count'}
-        />
-      ),
-      className: 'cursor-pointer',
-      dataIndex: 'products_count',
-      key: 'products_count',
-      align: 'center',
-      width: 180,
-      onHeaderCell: () => onHeaderClick('products_count'),
-    },
+    // {
+    //   title: (
+    //     <TitleWithSort
+    //       title={t('table:table-item-total-products')}
+    //       ascending={
+    //         sortingObj.sort === SortOrder.Asc &&
+    //         sortingObj.column === 'products_count'
+    //       }
+    //       isActive={sortingObj.column === 'products_count'}
+    //     />
+    //   ),
+    //   className: 'cursor-pointer',
+    //   dataIndex: 'products_count',
+    //   key: 'products_count',
+    //   align: 'center',
+    //   width: 180,
+    //   onHeaderCell: () => onHeaderClick('products_count'),
+    // },
 
-    {
-      title: (
-        <TitleWithSort
-          title={t('table:table-item-total-orders')}
-          ascending={
-            sortingObj.sort === SortOrder.Asc &&
-            sortingObj.column === 'orders_count'
-          }
-          isActive={sortingObj.column === 'orders_count'}
-        />
-      ),
-      className: 'cursor-pointer',
-      dataIndex: 'orders_count',
-      key: 'orders_count',
-      align: 'center',
-      onHeaderCell: () => onHeaderClick('orders_count'),
-      width: 180,
-    },
-    {
-      title: t('table:table-item-owner-name'),
-      dataIndex: 'owner',
-      key: 'owner',
-      align: alignLeft,
-      width: 250,
-      render: (owner: any) => (
-        <div className="flex items-center">
-          <Avatar name={owner?.name} src={owner?.profile?.avatar?.thumbnail} />
-          <span className="whitespace-nowrap font-medium ms-2">
-            {owner?.name}
-          </span>
-        </div>
-      ),
-    },
+    // {
+    //   title: (
+    //     <TitleWithSort
+    //       title={t('table:table-item-total-orders')}
+    //       ascending={
+    //         sortingObj.sort === SortOrder.Asc &&
+    //         sortingObj.column === 'orders_count'
+    //       }
+    //       isActive={sortingObj.column === 'orders_count'}
+    //     />
+    //   ),
+    //   className: 'cursor-pointer',
+    //   dataIndex: 'orders_count',
+    //   key: 'orders_count',
+    //   align: 'center',
+    //   onHeaderCell: () => onHeaderClick('orders_count'),
+    //   width: 180,
+    // },
+    // {
+    //   title: t('table:table-item-owner-name'),
+    //   dataIndex: 'owner',
+    //   key: 'owner',
+    //   align: alignLeft,
+    //   width: 250,
+    //   render: (owner: any) => (
+    //     <div className="flex items-center">
+    //       <Avatar name={owner?.name} src={owner?.profile?.avatar?.thumbnail} />
+    //       <span className="whitespace-nowrap font-medium ms-2">
+    //         {owner?.name}
+    //       </span>
+    //     </div>
+    //   ),
+    // },
     {
       title: (
         <TitleWithSort

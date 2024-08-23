@@ -121,18 +121,18 @@ const ProductList = ({
         </div>
       ),
     },
-    {
-      title: t('table:table-item-product-type'),
-      dataIndex: 'product_type',
-      key: 'product_type',
-      width: 150,
-      align: alignLeft,
-      render: (product_type: string) => (
-        <span className="truncate whitespace-nowrap capitalize">
-          {product_type}
-        </span>
-      ),
-    },
+    // {
+    //   title: t('table:table-item-product-type'),
+    //   dataIndex: 'product_type',
+    //   key: 'product_type',
+    //   width: 150,
+    //   align: alignLeft,
+    //   render: (product_type: string) => (
+    //     <span className="truncate whitespace-nowrap capitalize">
+    //       {product_type}
+    //     </span>
+    //   ),
+    // },
     {
       title: t('table:table-item-shop'),
       dataIndex: 'shop',
@@ -249,14 +249,14 @@ const ProductList = ({
             }
             className="capitalize"
           />
-          {record?.quantity > 0 && record?.quantity < 10 && (
+          {/* {record?.quantity > 0 && record?.quantity < 10 && (
             <Badge
               text={t('common:text-low-quantity')}
               color="bg-status-failed/10 text-status-failed"
               animate={true}
               className="capitalize"
             />
-          )}
+          )} */}
         </div>
       ),
     },
