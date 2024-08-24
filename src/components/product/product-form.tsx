@@ -517,7 +517,7 @@ export default function CreateOrUpdateProductForm({
 
             <Card className="w-full sm:w-8/12 md:w-2/3">
               <Input
-                label={`${t('form:input-label-name')}*`}
+                label={`${t('form:input-label-name')}`}
                 {...register('name', {
                   required: 'Name is required',
                 })}

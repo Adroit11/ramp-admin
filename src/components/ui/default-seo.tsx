@@ -2,33 +2,34 @@ import { useSettings } from '@/contexts/settings.context';
 import { DefaultSeo as NextDefaultSeo } from 'next-seo';
 
 const DefaultSeo = () => {
-  const settings = useSettings();
+  // const settings = useSettings();
   return (
     <NextDefaultSeo
-      title={settings.siteTitle ?? 'PickBazar'}
-      titleTemplate={`%s | ${settings?.seo?.metaTitle ?? 'E-Commerce'}`}
-      description={settings?.seo?.metaDescription || settings?.siteSubtitle}
-      canonical={settings?.seo?.canonicalUrl}
+      title={'Ramp | New Customers, More Sales'}
+      titleTemplate={'Ramp | New Customers, More Sales'}
+      defaultTitle="Ramp | New Customers, More Sales"
+      description={'Ramp | New Customers, More Sales'}
+      // canonical={settings?.seo?.canonicalUrl}
       openGraph={{
-        title: settings?.seo?.ogTitle,
-        description: settings?.seo?.ogDescription,
+        title: 'Ramp | New Customers, More Sales',
+        description: 'Ramp | New Customers, More Sales',
         type: 'website',
         locale: 'en_US',
-        site_name: settings?.siteTitle,
+        site_name: 'Ramp',
         images: [
           {
-            url: settings?.seo?.ogImage?.original,
-            width: 800,
-            height: 600,
-            alt: settings?.seo?.ogTitle,
+            url: 'http://res.cloudinary.com/dc9kfp5gt/image/upload/v1724451002/RampIcon/nk4lnmcd8vhwhet6mvn8.svg',
+            width: 497,
+            height: 100,
+            alt: 'Ramp | New Customers, More Sales',
           },
         ],
       }}
-      twitter={{
-        handle: settings?.seo?.twitterHandle,
-        site: settings?.siteTitle,
-        cardType: settings?.seo?.twitterCardType,
-      }}
+      // twitter={{
+      //   handle: settings?.seo?.twitterHandle,
+      //   site: settings?.siteTitle,
+      //   cardType: settings?.seo?.twitterCardType,
+      // }}
       additionalMetaTags={[
         {
           name: 'viewport',
@@ -44,10 +45,10 @@ const DefaultSeo = () => {
         },
       ]}
       additionalLinkTags={[
-        {
-          rel: 'apple-touch-icon',
-          href: 'icons/apple-icon-180.png',
-        },
+        // {
+        //   rel: 'apple-touch-icon',
+        //   href: 'icons/apple-icon-180.png',
+        // },
         {
           rel: 'manifest',
           href: '/manifest.json',

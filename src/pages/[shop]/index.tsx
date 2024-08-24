@@ -255,12 +255,16 @@ export default function ShopPage() {
           <div className="w-full flex-1 rounded-lg bg-white p-4 lg:p-6 xl:p-7 2xl:p-10">
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 xl:gap-5 2xl:grid-cols-3 2xl:gap-7">
               <IconCard
-                content={'0'}
+                content={
+                  shopData?.no_of_products ? `${shopData.no_of_products}` : '0'
+                }
                 title={t('common:text-total-products')}
                 icon="ProductsIcon"
               />
               <IconCard
-                content={'0'}
+                content={
+                  shopData?.no_of_orders ? `${shopData.no_of_orders}` : '0'
+                }
                 title={t('common:text-total-orders')}
                 icon="OrdersIcon"
                 iconClassName="text-[#FF8D29]"

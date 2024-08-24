@@ -105,14 +105,14 @@ const ShopCard: React.FC<ShopCardProps> = ({ shop }) => {
           <ListItem
             // title={t('text-title-commission')}
             title={t('Products')}
-            info={shop?.balance?.admin_commission_rate ?? (0 as number)}
+            info={shop?.no_of_products ?? (0 as number)}
           />
         </li>
         <li>
           <ListItem
             // title={t('text-title-sale')}
             title={t('Orders')}
-            info={shop?.balance?.total_earnings ?? (0 as number)}
+            info={shop?.no_of_orders ?? (0 as number)}
           />
         </li>
         {/* <li>

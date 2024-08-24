@@ -114,9 +114,9 @@ const ProductList = ({
           </div>
           <div className="flex flex-col">
             <span className="truncate font-medium">{name}</span>
-            <span className="truncate whitespace-nowrap pt-1 pb-0.5 text-[13px] text-body/80">
+            {/* <span className="truncate whitespace-nowrap pt-1 pb-0.5 text-[13px] text-body/80">
               {product_type}
-            </span>
+            </span> */}
           </div>
         </div>
       ),
