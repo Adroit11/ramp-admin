@@ -17,6 +17,8 @@ export interface GetShopDetailsTypeForOwner {
   id: number;
   uid: string;
   owner_id: number;
+  no_of_products: number | null;
+  no_of_orders: number | null;
   owner: {
     id: number;
     uid: string;

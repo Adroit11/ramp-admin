@@ -114,25 +114,25 @@ const ProductList = ({
           </div>
           <div className="flex flex-col">
             <span className="truncate font-medium">{name}</span>
-            <span className="truncate whitespace-nowrap pt-1 pb-0.5 text-[13px] text-body/80">
+            {/* <span className="truncate whitespace-nowrap pt-1 pb-0.5 text-[13px] text-body/80">
               {product_type}
-            </span>
+            </span> */}
           </div>
         </div>
       ),
     },
-    {
-      title: t('table:table-item-product-type'),
-      dataIndex: 'product_type',
-      key: 'product_type',
-      width: 150,
-      align: alignLeft,
-      render: (product_type: string) => (
-        <span className="truncate whitespace-nowrap capitalize">
-          {product_type}
-        </span>
-      ),
-    },
+    // {
+    //   title: t('table:table-item-product-type'),
+    //   dataIndex: 'product_type',
+    //   key: 'product_type',
+    //   width: 150,
+    //   align: alignLeft,
+    //   render: (product_type: string) => (
+    //     <span className="truncate whitespace-nowrap capitalize">
+    //       {product_type}
+    //     </span>
+    //   ),
+    // },
     {
       title: t('table:table-item-shop'),
       dataIndex: 'shop',
@@ -249,14 +249,14 @@ const ProductList = ({
             }
             className="capitalize"
           />
-          {record?.quantity > 0 && record?.quantity < 10 && (
+          {/* {record?.quantity > 0 && record?.quantity < 10 && (
             <Badge
               text={t('common:text-low-quantity')}
               color="bg-status-failed/10 text-status-failed"
               animate={true}
               className="capitalize"
             />
-          )}
+          )} */}
         </div>
       ),
     },

@@ -340,6 +340,8 @@ export interface Shop {
   slug?: string;
   description?: string;
   cover_image?: string;
+  no_of_products: number | null;
+  no_of_orders: number | null;
   // logo?: Attachment;
   logo?: string;
   address?: UserAddress;

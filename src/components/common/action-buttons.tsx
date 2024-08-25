@@ -181,7 +181,7 @@ const ActionButtons = ({
           <button
             onClick={() => handleProductStatus(true)}
             className="text-accent transition duration-200 hover:text-accent-hover focus:outline-none"
-            title={t('common:text-approve-shop')}
+            title={t('Publish Product')}
           >
             <CheckMarkCircle width={16} />
           </button>
@@ -189,7 +189,7 @@ const ActionButtons = ({
           <button
             onClick={() => handleProductStatus(false)}
             className="text-red-500 transition duration-200 hover:text-red-600 focus:outline-none"
-            title={t('common:text-disapprove-shop')}
+            title={t('Unpublish Product')}
           >
             <CloseFillIcon width={16} />
           </button>

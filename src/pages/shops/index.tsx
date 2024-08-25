@@ -9,7 +9,7 @@ import { useMemo, useState } from 'react';
 import Search from '@/components/common/search';
 import { adminOnly } from '@/utils/auth-utils';
 import { useShopsQuery } from '@/data/shop';
-import { SortOrder } from '@/types';
+import { Shop, SortOrder } from '@/types';
 import PageHeading from '@/components/common/page-heading';
 import { useQuery } from 'react-query';
 import { getShopsFn } from '@/services/shop';
@@ -35,11 +35,16 @@ export default function AllShopPage() {
 
   const shopsData = useMemo(() => {
     if (shopsQuery.data?.data) {
+      if (searchTerm) {
+        return (shopsQuery.data.data as Shop[])?.filter(
+          (x) => x.name?.toLowerCase().includes(searchTerm.toLowerCase()),
+        );
+      }
       return shopsQuery.data.data;
     }
 
     return null;
-  }, [shopsQuery.isLoading, shopsQuery.data]);
+  }, [shopsQuery.isLoading, shopsQuery.data, searchTerm]);
 
   if (shopsQuery.isLoading) return <Loader text={t('common:text-loading')} />;
   if (shopsQuery.isError)

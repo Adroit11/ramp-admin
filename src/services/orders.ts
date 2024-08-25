@@ -69,6 +69,15 @@ export const addAdminFn = async (data: {
 
 // ORDERS
 
+export const getStoreOrders = async (uid: string) => {
+  try {
+    const res = await request.post('/shop/orders', { uid });
+
+    return res.data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+};
 export const getOrders = async () => {
   try {
     const res = await request.get('/orders');

@@ -13,6 +13,7 @@ import {
   adminOnly,
   adminOwnerAndStaffOnly,
   getAuthCredentials,
+  getUserAuthData,
   hasAccess,
 } from '@/utils/auth-utils';
 import { useOrdersQuery } from '@/data/order';
@@ -27,8 +28,9 @@ import { useMeQuery } from '@/data/user';
 import { Routes } from '@/config/routes';
 import PageHeading from '@/components/common/page-heading';
 import { useQuery } from 'react-query';
-import { getOrders } from '@/services/orders';
+import { getOrders, getStoreOrders } from '@/services/orders';
 import { getErrorMessage } from '@/utils/helpers';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function Orders() {
   const router = useRouter();
@@ -39,6 +41,7 @@ export default function Orders() {
     query: { shop },
   } = router;
   const { t } = useTranslation();
+  const userAuthData = getUserAuthData();
   const [orderBy, setOrder] = useState('created_at');
   const [sortedBy, setColumn] = useState<SortOrder>(SortOrder.Desc);
   const { data: shopData, isLoading: fetchingShop } = useShopQuery({
@@ -62,8 +65,12 @@ export default function Orders() {
   //   },
   // );
 
-  const ordersQuery = useQuery(['get_orders'], () => {
-    return getOrders();
+  const ordersQuery = useQuery(['get_orders', shop], () => {
+    if (userAuthData?.role === 'super_admin') {
+      return getOrders();
+    }
+
+    return getStoreOrders(shop as string);
   });
 
   const orders = useMemo(() => {

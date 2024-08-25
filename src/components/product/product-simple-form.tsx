@@ -42,7 +42,7 @@ export default function ProductSimpleForm({ initialValues }: IProps) {
 
       <Card className="w-full sm:w-8/12 md:w-2/3">
         <Input
-          label={`${t('form:input-label-price')}*`}
+          label={`${t('Price in USD')}`}
           {...register('price', {
             required: 'Price is required',
           })}
@@ -66,7 +66,7 @@ export default function ProductSimpleForm({ initialValues }: IProps) {
 
         {/* {!is_external && ( */}
         <Input
-          label={`${t('form:input-label-quantity')}*`}
+          label={`${t('form:input-label-quantity')}`}
           type="number"
           {...register('quantity', {
             required: 'Quantity is required',

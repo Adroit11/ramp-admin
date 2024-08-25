@@ -113,8 +113,8 @@ const ShopList = ({
         />
       ),
       className: 'cursor-pointer',
-      dataIndex: 'products_count',
-      key: 'products_count',
+      dataIndex: 'no_of_products',
+      key: 'no_of_products',
       align: 'center',
       width: 180,
       onHeaderCell: () => onHeaderClick('products_count'),
@@ -132,27 +132,27 @@ const ShopList = ({
         />
       ),
       className: 'cursor-pointer',
-      dataIndex: 'orders_count',
-      key: 'orders_count',
+      dataIndex: 'no_of_orders',
+      key: 'no_of_orders',
       align: 'center',
       onHeaderCell: () => onHeaderClick('orders_count'),
       width: 180,
     },
-    {
-      title: t('table:table-item-owner-name'),
-      dataIndex: 'owner',
-      key: 'owner',
-      align: alignLeft,
-      width: 250,
-      render: (owner: any) => (
-        <div className="flex items-center">
-          <Avatar name={owner?.name} src={owner?.profile?.avatar?.thumbnail} />
-          <span className="whitespace-nowrap font-medium ms-2">
-            {owner?.name}
-          </span>
-        </div>
-      ),
-    },
+    // {
+    //   title: t('table:table-item-owner-name'),
+    //   dataIndex: 'owner',
+    //   key: 'owner',
+    //   align: alignLeft,
+    //   width: 250,
+    //   render: (owner: any) => (
+    //     <div className="flex items-center">
+    //       <Avatar name={owner?.name} src={owner?.profile?.avatar?.thumbnail} />
+    //       <span className="whitespace-nowrap font-medium ms-2">
+    //         {owner?.name}
+    //       </span>
+    //     </div>
+    //   ),
+    // },
     {
       title: (
         <TitleWithSort
