@@ -61,7 +61,7 @@ const OwnerLayout: React.FC<{ children?: React.ReactNode }> = ({
       <MobileNavigation>
         <OwnerInformation />
         {/* {!permission ? <SideBarMenu /> : null} */}
-        {!userAuthData?.permissions ? <SideBarMenu /> : null}
+        <SideBarMenu />
       </MobileNavigation>
 
       <div className="flex flex-1">
