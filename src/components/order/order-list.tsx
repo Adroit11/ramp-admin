@@ -9,7 +9,7 @@ import timezone from 'dayjs/plugin/timezone';
 import { Product, SortOrder, UserAddress } from '@/types';
 import { useTranslation } from 'next-i18next';
 import { useIsRTL } from '@/utils/locals';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import TitleWithSort from '@/components/ui/title-with-sort';
 import { Order, MappedPaginatorInfo } from '@/types';
 import { NoDataFound } from '@/components/icons/no-data-found';
@@ -81,172 +81,178 @@ const OrderList = ({
     },
   });
 
-  const columns = [
-    {
-      title: t('table:table-item-tracking-number'),
-      dataIndex: 'tracking_number',
-      key: 'tracking_number',
-      align: alignLeft,
-      width: 200,
-    },
-    {
-      title: (
-        <TitleWithSort
-          title={t('table:table-item-customer')}
-          ascending={
-            sortingObj.sort === SortOrder.Asc && sortingObj.column === 'name'
-          }
-          isActive={sortingObj.column === 'name'}
-        />
-      ),
-      dataIndex: 'customer',
-      key: 'name',
-      align: alignLeft,
-      width: 250,
-      onHeaderCell: () => onHeaderClick('name'),
-      // render: (logo: any, record: any) => (
-      //   <Image
-      //     src={logo?.thumbnail ?? siteSettings.product.placeholder}
-      //     alt={record?.name}
-      //     width={42}
-      //     height={42}
-      //     className="overflow-hidden rounded"
-      //   />
-      // ),
-      render: (customer: any) => (
-        <div className="flex items-center">
-          {/* <Avatar name={customer.name} src={customer?.profile.avatar.thumbnail} /> */}
-          <Avatar name={customer?.name} />
-          <div className="flex flex-col whitespace-nowrap font-medium ms-2">
-            {customer?.name ? customer?.name : t('common:text-guest')}
-            <span className="text-[13px] font-normal text-gray-500/80">
-              {customer?.email}
-            </span>
+  const columns = useMemo(() => {
+    const cols = [
+      {
+        title: t('table:table-item-tracking-number'),
+        dataIndex: 'tracking_number',
+        key: 'tracking_number',
+        align: alignLeft,
+        width: 200,
+      },
+      {
+        title: (
+          <TitleWithSort
+            title={t('table:table-item-customer')}
+            ascending={
+              sortingObj.sort === SortOrder.Asc && sortingObj.column === 'name'
+            }
+            isActive={sortingObj.column === 'name'}
+          />
+        ),
+        dataIndex: 'customer',
+        key: 'name',
+        align: alignLeft,
+        width: 250,
+        onHeaderCell: () => onHeaderClick('name'),
+        // render: (logo: any, record: any) => (
+        //   <Image
+        //     src={logo?.thumbnail ?? siteSettings.product.placeholder}
+        //     alt={record?.name}
+        //     width={42}
+        //     height={42}
+        //     className="overflow-hidden rounded"
+        //   />
+        // ),
+        render: (customer: any) => (
+          <div className="flex items-center">
+            {/* <Avatar name={customer.name} src={customer?.profile.avatar.thumbnail} /> */}
+            <Avatar name={customer?.name} />
+            <div className="flex flex-col whitespace-nowrap font-medium ms-2">
+              {customer?.name ? customer?.name : t('common:text-guest')}
+              <span className="text-[13px] font-normal text-gray-500/80">
+                {customer?.email}
+              </span>
+            </div>
           </div>
-        </div>
-      ),
-    },
-    {
-      title: t('table:table-item-products'),
-      dataIndex: 'products',
-      key: 'products',
-      align: 'center',
-      render: (products: Product) => <span>{products.length}</span>,
-    },
-    {
-      // title: t('table:table-item-order-date'),
-      title: (
-        <TitleWithSort
-          title={t('table:table-item-order-date')}
-          ascending={
-            sortingObj?.sort === SortOrder?.Asc &&
-            sortingObj?.column === 'created_at'
-          }
-          isActive={sortingObj?.column === 'created_at'}
-          className="cursor-pointer"
-        />
-      ),
-      dataIndex: 'created_at',
-      key: 'created_at',
-      align: 'center',
-      onHeaderCell: () => onHeaderClick('created_at'),
-      render: (date: string) => {
-        dayjs.extend(relativeTime);
-        dayjs.extend(utc);
-        dayjs.extend(timezone);
-        return (
-          <span className="whitespace-nowrap">
-            {dayjs.utc(date).tz(dayjs.tz.guess()).fromNow()}
-          </span>
-        );
+        ),
       },
-    },
-    {
-      title: t('table:table-item-delivery-fee'),
-      dataIndex: 'delivery_fee',
-      key: 'delivery_fee',
-      align: 'center',
-      render: function Render(value: any) {
-        const delivery_fee = value ? value : 0;
-        const { price } = usePrice({
-          amount: delivery_fee,
-        });
-        return <span>{price}</span>;
+      {
+        title: t('table:table-item-products'),
+        dataIndex: 'products',
+        key: 'products',
+        align: 'center',
+        render: (products: Product) => <span>{products.length}</span>,
       },
-    },
-    {
-      title: (
-        <TitleWithSort
-          title={t('table:table-item-total')}
-          ascending={
-            sortingObj?.sort === SortOrder?.Asc &&
-            sortingObj?.column === 'total'
-          }
-          isActive={sortingObj?.column === 'total'}
-          className="cursor-pointer"
-        />
-      ),
-      dataIndex: 'total',
-      key: 'total',
-      align: 'center',
-      width: 120,
-      onHeaderCell: () => onHeaderClick('total'),
-      render: function Render(value: any) {
-        const { price } = usePrice({
-          amount: value,
-        });
-        return <span className="whitespace-nowrap">{price}</span>;
+      {
+        // title: t('table:table-item-order-date'),
+        title: (
+          <TitleWithSort
+            title={t('table:table-item-order-date')}
+            ascending={
+              sortingObj?.sort === SortOrder?.Asc &&
+              sortingObj?.column === 'created_at'
+            }
+            isActive={sortingObj?.column === 'created_at'}
+            className="cursor-pointer"
+          />
+        ),
+        dataIndex: 'created_at',
+        key: 'created_at',
+        align: 'center',
+        onHeaderCell: () => onHeaderClick('created_at'),
+        render: (date: string) => {
+          dayjs.extend(relativeTime);
+          dayjs.extend(utc);
+          dayjs.extend(timezone);
+          return (
+            <span className="whitespace-nowrap">
+              {dayjs.utc(date).tz(dayjs.tz.guess()).fromNow()}
+            </span>
+          );
+        },
       },
-    },
-    {
-      title: t('table:table-item-status'),
-      dataIndex: 'order_status',
-      key: 'order_status',
-      align: 'center',
-      render: (order_status: string) => (
-        <Badge text={t(order_status)} color={StatusColor(order_status)} />
-      ),
-    },
-    {
-      title: t('table:table-item-actions'),
-      dataIndex: 'uid',
-      key: 'actions',
-      align: alignRight,
-      width: 120,
-      render: (uid: string, order: Order) => {
-        const currentButtonLoading = !!loading && loading === order?.shop_id;
-        return (
-          <>
-            {/* @ts-ignore */}
-            {/* {order?.children?.length ? (
-              ''
-            ) : (
-              <>
-                {permissions?.includes(SUPER_ADMIN) && order?.shop_id ? (
-                  <button
-                    onClick={() => onSubmit(order?.shop_id)}
-                    disabled={currentButtonLoading}
-                    className="cursor-pointer text-accent transition-colors duration-300 me-1.5 hover:text-accent-hover"
-                  >
-                    {/* <ChatIcon width="19" height="20" /> 
-                  </button>
-                ) : (
-                  ''
-                )}
-              </>
-            )} */}
-            {userAuthData?.role === 'super_admin' ? (
-              <ActionButtons
-                id={uid}
-                detailsUrl={`${router.asPath}/${uid}`}
-                customLocale={order.language}
-              />
-            ) : null}
-          </>
-        );
+      // {
+      //   title: t('table:table-item-delivery-fee'),
+      //   dataIndex: 'delivery_fee',
+      //   key: 'delivery_fee',
+      //   align: 'center',
+      //   render: function Render(value: any) {
+      //     const delivery_fee = value ? value : 0;
+      //     const { price } = usePrice({
+      //       amount: delivery_fee,
+      //     });
+      //     return <span>{price}</span>;
+      //   },
+      // },
+      {
+        title: (
+          <TitleWithSort
+            title={t('table:table-item-total')}
+            ascending={
+              sortingObj?.sort === SortOrder?.Asc &&
+              sortingObj?.column === 'total'
+            }
+            isActive={sortingObj?.column === 'total'}
+            className="cursor-pointer"
+          />
+        ),
+        dataIndex: 'total',
+        key: 'total',
+        align: 'center',
+        width: 120,
+        onHeaderCell: () => onHeaderClick('total'),
+        render: function Render(value: any) {
+          const { price } = usePrice({
+            amount: value,
+          });
+          return <span className="whitespace-nowrap">{price}</span>;
+        },
       },
-    },
-  ];
+      {
+        title: t('table:table-item-status'),
+        dataIndex: 'order_status',
+        key: 'order_status',
+        align: 'center',
+        render: (order_status: string) => (
+          <Badge text={t(order_status)} color={StatusColor(order_status)} />
+        ),
+      },
+    ];
+    if (userAuthData?.role === 'super_admin') {
+      cols.push({
+        title: t('table:table-item-actions'),
+        dataIndex: 'uid',
+        key: 'actions',
+        align: alignRight,
+        width: 120,
+        // @ts-ignore
+        render: (uid: string, order: Order) => {
+          const currentButtonLoading = !!loading && loading === order?.shop_id;
+          return (
+            <>
+              {/* @ts-ignore */}
+              {/* {order?.children?.length ? (
+            ''
+          ) : (
+            <>
+              {permissions?.includes(SUPER_ADMIN) && order?.shop_id ? (
+                <button
+                  onClick={() => onSubmit(order?.shop_id)}
+                  disabled={currentButtonLoading}
+                  className="cursor-pointer text-accent transition-colors duration-300 me-1.5 hover:text-accent-hover"
+                >
+                  {/* <ChatIcon width="19" height="20" /> 
+                </button>
+              ) : (
+                ''
+              )}
+            </>
+          )} */}
+              {userAuthData?.role === 'super_admin' ? (
+                <ActionButtons
+                  id={uid}
+                  detailsUrl={`${router.asPath}/${uid}`}
+                  customLocale={order.language}
+                />
+              ) : null}
+            </>
+          );
+        },
+      });
+    }
+    return cols;
+  }, [userAuthData]);
 
   return (
     <>

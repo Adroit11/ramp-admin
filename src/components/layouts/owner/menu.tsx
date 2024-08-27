@@ -52,6 +52,7 @@ const SideBarMenu = () => {
                       : null,
                   )}
                   title={t(item?.label)}
+                  onClick={() => {}}
                 >
                   <span
                     className={cn(

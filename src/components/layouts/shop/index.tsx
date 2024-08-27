@@ -114,7 +114,7 @@ const SideBarGroup = () => {
   const { width } = useWindowSize();
   const { t } = useTranslation();
 
-  // console.log('kkkkkk', menuItems.root);
+  // console.log('kkkkkk', menuKeys);
   return (
     <>
       {menuKeys?.map((menu, index) => (
