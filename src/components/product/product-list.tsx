@@ -133,28 +133,29 @@ const ProductList = ({
     //     </span>
     //   ),
     // },
-    {
-      title: t('table:table-item-shop'),
-      dataIndex: 'shop',
-      key: 'shop',
-      width: 170,
-      align: alignLeft,
-      ellipsis: true,
-      render: (shop: Shop) => (
-        <div className="flex items-center font-medium">
-          <div className="relative aspect-square h-9 w-9 shrink-0 overflow-hidden rounded-full border border-border-200/80 bg-gray-100 me-2">
-            <Image
-              src={(shop?.logo as string) ?? siteSettings.product.placeholder}
-              alt={shop?.name ?? 'Shop Name'}
-              fill
-              priority={true}
-              sizes="(max-width: 768px) 100vw"
-            />
-          </div>
-          <span className="truncate">{shop?.name}</span>
-        </div>
-      ),
-    },
+    // {
+    //   title: t('Owner'),
+    //   dataIndex: 'owner',
+    //   key: 'owner',
+    //   width: 170,
+    //   align: alignLeft,
+    //   ellipsis: true,
+    //   render: (owner: Product['owner']) => (
+    //     <div className="flex flex-col gap-1 items-start font-medium">
+    //       {/* <div className="relative aspect-square h-9 w-9 shrink-0 overflow-hidden rounded-full border border-border-200/80 bg-gray-100 me-2">
+    //         <Image
+    //           src={(shop?.logo as string) ?? siteSettings.product.placeholder}
+    //           alt={shop?.name ?? 'Shop Name'}
+    //           fill
+    //           priority={true}
+    //           sizes="(max-width: 768px) 100vw"
+    //         />
+    //       </div> */}
+    //       <span className="truncate">{owner?.name}</span>
+    //       <span className="truncate">{owner?.email}</span>
+    //     </div>
+    //   ),
+    // },
 
     {
       title: (
@@ -169,29 +170,19 @@ const ProductList = ({
       className: 'cursor-pointer',
       dataIndex: 'price',
       key: 'price',
-      align: alignRight,
+      align: 'center',
       width: 180,
       onHeaderCell: () => onHeaderClick('price'),
-      render: function Render(value: number, record: Product) {
-        const { price: max_price } = usePrice({
-          amount: record?.max_price as number,
-        });
-        const { price: min_price } = usePrice({
-          amount: record?.min_price as number,
-        });
-
-        const { price } = usePrice({
-          amount: value,
-        });
-
-        const renderPrice =
-          record?.product_type === ProductType.Variable
-            ? `${min_price} - ${max_price}`
-            : price;
-
+      render: function Render(price: number, record: Product) {
+        const p = `  ${record.shop?.currency?.code} ${new Intl.NumberFormat(
+          'en-US',
+          {
+            style: 'decimal',
+          },
+        ).format(price ?? 0)}`;
         return (
-          <span className="whitespace-nowrap" title={renderPrice}>
-            {renderPrice}
+          <span className="whitespace-nowrap" title={p}>
+            {p}
           </span>
         );
       },

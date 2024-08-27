@@ -257,11 +257,16 @@ const OwnerShopLayout = () => {
 };
 
 const OwnerDashboard = () => {
+  const userAuthData = getUserAuthData();
   // const { permissions } = getAuthCredentials();
   // let permission = hasAccess(adminOnly, permissions);
 
-  // return permission ? <ShopList /> : <OwnerShopLayout />;
-  return <OwnerShopLayout />;
+  return userAuthData?.role === 'super_admin' ? (
+    <ShopList />
+  ) : (
+    <OwnerShopLayout />
+  );
+  // return <OwnerShopLayout />;
 };
 
 export default OwnerDashboard;

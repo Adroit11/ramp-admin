@@ -9,20 +9,27 @@ import Checkbox from '@/components/ui/checkbox/checkbox';
 import { Config } from '@/config';
 import { useRouter } from 'next/router';
 import Alert from '@/components/ui/alert';
+import { useCurrency } from '@/hooks/useCurrency';
+import Select from '../ui/select/select';
+import { useAuth } from '@/hooks/useAuth';
+import { GetShopDetailsTypeForOwner } from '@/types/shops';
 
 type IProps = {
   initialValues: any;
+  shopData: GetShopDetailsTypeForOwner | null;
 };
 
-export default function ProductSimpleForm({ initialValues }: IProps) {
+export default function ProductSimpleForm({ initialValues, shopData }: IProps) {
   const {
     register,
     control,
     watch,
     formState: { errors },
+    setValue,
   } = useFormContext();
   const { t } = useTranslation();
   const { locale } = useRouter();
+  const { user } = useAuth();
   const isTranslateProduct = locale !== Config.defaultLanguage;
 
   const is_digital = watch('is_digital');
@@ -42,7 +49,15 @@ export default function ProductSimpleForm({ initialValues }: IProps) {
 
       <Card className="w-full sm:w-8/12 md:w-2/3">
         <Input
-          label={`${t('Price in USD')}`}
+          label={`${t("Shop's currency")}`}
+          name={'currency'}
+          variant="outline"
+          className="mb-5"
+          defaultValue={initialValues?.currency ?? shopData?.currency?.code}
+          disabled
+        />
+        <Input
+          label={`${t('Price')}`}
           {...register('price', {
             required: 'Price is required',
           })}
@@ -55,6 +70,7 @@ export default function ProductSimpleForm({ initialValues }: IProps) {
           }
           required
         />
+
         {/* <Input
           label={t('form:input-label-sale-price')}
           type="number"

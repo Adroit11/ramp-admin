@@ -94,11 +94,11 @@ const RecentOrders = ({
       dataIndex: 'total',
       key: 'total',
       align: 'center',
-      render: function Render(value: any) {
-        const { price } = usePrice({
-          amount: value,
-        });
-        return <span className="whitespace-nowrap font-medium">{price}</span>;
+      render: function Render(value: any, item: Order) {
+        const p = `  ${item.currency} ${new Intl.NumberFormat('en-US', {
+          style: 'decimal',
+        }).format(value ?? 0)}`;
+        return <span className="whitespace-nowrap font-medium">{p}</span>;
       },
     },
     {

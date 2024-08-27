@@ -74,6 +74,7 @@ export default function UpdateShopPage() {
             cover_image: shopData.cover_image,
             address: Object.values(shopData.address),
             url: shopData.shop_website_link,
+            currency: shopData.currency,
           }}
         />
       ) : null}

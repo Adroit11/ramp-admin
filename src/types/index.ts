@@ -348,6 +348,7 @@ export interface Shop {
   settings?: ShopSettings;
   created_at?: string;
   updated_at?: string;
+  currency?: CurrencyType;
 }
 
 export interface Balance {
@@ -629,6 +630,7 @@ export interface Order {
   customer_contact: string;
   customer_name: string;
   customer_id: number;
+  currency: string;
   customer?: User;
   amount: number;
   sales_tax: number;
@@ -695,9 +697,16 @@ export interface VerifyCouponResponse {
   message?: string;
 }
 
+export interface CurrencyType {
+  name: string;
+  code: string;
+  uid: string;
+  exchange_rate: string;
+}
 export interface Product {
   id: string;
   uid: string;
+  currency: CurrencyType;
   translated_languages: string[];
   shop_id: string;
   name: string;
@@ -739,6 +748,21 @@ export interface Product {
   updated_at: string;
   ratings: number;
   shop?: Shop;
+  owner?: {
+    created_at: string;
+    email: string;
+    email_verified_at: string;
+    id: number;
+    is_active: 0 | 1;
+    name: string;
+    statistics: {
+      total_products: number;
+      total_shops: number;
+      total_orders: number;
+    };
+    uid: string;
+    updated_at: string;
+  };
 }
 export interface CreateProduct {
   name: string;

@@ -6,6 +6,7 @@ export const Routes = {
   forgotPassword: '/forgot-password',
   resetPassword: '/reset-password',
   adminMyShops: '/my-shops',
+  currencies: '/currencies',
   profile: '/profile',
   verifyCoupons: '/coupons/verify',
   settings: '/settings',

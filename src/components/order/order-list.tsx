@@ -192,11 +192,14 @@ const OrderList = ({
         align: 'center',
         width: 120,
         onHeaderCell: () => onHeaderClick('total'),
-        render: function Render(value: any) {
-          const { price } = usePrice({
-            amount: value,
-          });
-          return <span className="whitespace-nowrap">{price}</span>;
+        render: function Render(value: any, item: Order) {
+          // const { price } = usePrice({
+          //   amount: value,
+          // });
+          const p = `  ${item.currency} ${new Intl.NumberFormat('en-US', {
+            style: 'decimal',
+          }).format(value ?? 0)}`;
+          return <span className="whitespace-nowrap">{p}</span>;
         },
       },
       {
@@ -209,7 +212,9 @@ const OrderList = ({
         ),
       },
     ];
+
     if (userAuthData?.role === 'super_admin') {
+      // @ts-ignore
       cols.push({
         title: t('table:table-item-actions'),
         dataIndex: 'uid',
