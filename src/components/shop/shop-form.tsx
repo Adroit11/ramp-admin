@@ -15,6 +15,7 @@ import { useSettingsQuery } from '@/data/settings';
 import { useCreateShopMutation, useUpdateShopMutation } from '@/data/shop';
 import {
   BalanceInput,
+  CurrencyType,
   ItemProps,
   ShopSettings,
   ShopSocialInput,
@@ -52,6 +53,8 @@ import { toast } from 'react-toastify';
 import { Routes } from '@/config/routes';
 import { getErrorMessage } from '@/utils/helpers';
 import { useAuth } from '@/hooks/useAuth';
+import Select from '../ui/select/select';
+import { useCurrency } from '@/hooks/useCurrency';
 
 // const socialIcon = [
 //   {
@@ -95,9 +98,23 @@ type FormValues = {
   image: File | string;
   address: UserAddressInput;
   url?: string;
+  currency?: string;
 };
 
-const ShopForm = ({ initialValues }: { initialValues?: EditShopDataType }) => {
+interface EditShopProps {
+  uid: string;
+  description: string;
+  address: string[];
+  url?: string;
+  shop_website_link?: string;
+  cover_image?: File | string;
+  image?: File | string;
+
+  currency?: CurrencyType;
+  name?: string;
+}
+
+const ShopForm = ({ initialValues }: { initialValues?: EditShopProps }) => {
   const { user } = useAuth();
   // const [location] = useAtom(locationAtom);
   // const { mutate: createShop, isLoading: creating } = useCreateShopMutation();
@@ -126,6 +143,7 @@ const ShopForm = ({ initialValues }: { initialValues?: EditShopDataType }) => {
             name: initialValues.name,
             description: initialValues.description,
             url: initialValues.url,
+            currency: initialValues.currency?.code,
             address: {
               street_address: initialValues.address[0],
               city: initialValues.address[1],
@@ -143,6 +161,7 @@ const ShopForm = ({ initialValues }: { initialValues?: EditShopDataType }) => {
 
   const { openModal } = useModalAction();
   const { locale } = router;
+  const { currencies } = useCurrency();
   // const {
   //   // @ts-ignore
   //   settings: { options },
@@ -190,6 +209,12 @@ const ShopForm = ({ initialValues }: { initialValues?: EditShopDataType }) => {
     //     : [],
     // };
     if (initialValues) {
+      if (!initialValues.url && !values.url) {
+        toast.error('URL is required');
+
+        return;
+      }
+
       const data: EditShopDataType = {
         uid: initialValues.uid,
         address: [
@@ -199,12 +224,14 @@ const ShopForm = ({ initialValues }: { initialValues?: EditShopDataType }) => {
           `${values.address.country}`,
         ],
         description: values.description,
+        url: values.url ?? initialValues.url,
       };
 
-      if (initialValues.url) {
-        data.url = values.url ?? initialValues.url;
+      if (initialValues.currency) {
+        data.currency = values.currency ?? initialValues.currency?.code;
       }
 
+      // console.log('data is', data);
       updateShop.mutate(data);
     } else {
       if (
@@ -212,12 +239,15 @@ const ShopForm = ({ initialValues }: { initialValues?: EditShopDataType }) => {
         !values.cover_image ||
         !values.description ||
         !values.image ||
-        !values.name
+        !values.name ||
+        !values.url
       ) {
         toast.error('All fields are required');
       }
       const data = {
         ...values,
+        url: values.url,
+        currency: values.currency,
         cover_image: values.cover_image as File,
         image: values.image as File,
         address: [
@@ -228,13 +258,11 @@ const ShopForm = ({ initialValues }: { initialValues?: EditShopDataType }) => {
         ],
       } satisfies CreateShopDataType;
 
-      if (values.url) {
-        data.url = values.url;
-      }
-
       createShop.mutate(data);
     }
   }
+
+  // console.log('iii', initialValues);
 
   const createShop = useMutation({
     mutationFn: createShopFn,
@@ -382,10 +410,48 @@ const ShopForm = ({ initialValues }: { initialValues?: EditShopDataType }) => {
             <Input
               label={t('Shop Website URL')}
               {...register('url', {
-                required: false,
+                required: 'Shop URL is required',
               })}
               variant="outline"
+              required
             />
+
+            <div className="my-6">
+              <label
+                htmlFor={'currency'}
+                className="mb-3 block text-sm font-semibold leading-none text-body-dark"
+              >
+                {t('Shop Currency (defaults to USD)')}
+                {/* <span className="ml-0.5 text-red-500">*</span> */}
+              </label>
+              <Select
+                placeholder={
+                  initialValues?.currency
+                    ? initialValues.currency?.name
+                    : 'Pick a currency'
+                }
+                options={
+                  currencies && Array.isArray(currencies)
+                    ? currencies.map((x) => ({
+                        label: x.name,
+                        value: x.code,
+                      }))
+                    : []
+                }
+                onChange={(val: any) => {
+                  // console.log(val);
+                  setValue('currency', val.value as string);
+                }}
+                defaultValue={
+                  initialValues?.currency
+                    ? {
+                        label: initialValues.currency?.name,
+                        value: initialValues.currency?.code,
+                      }
+                    : undefined
+                }
+              />
+            </div>
           </Card>
         </div>
         {/* <div className="flex flex-wrap pb-8 my-5 border-b border-gray-300 border-dashed sm:my-8">

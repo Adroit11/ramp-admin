@@ -140,6 +140,11 @@ export const siteSettings = {
             label: 'sidebar-nav-item-my-shops',
             icon: 'MyShopIcon',
           },
+          {
+            href: Routes.currencies,
+            label: 'Currency Management',
+            icon: 'CategoriesIcon',
+          },
         ],
       },
 

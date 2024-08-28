@@ -31,3 +31,10 @@ export interface UserAuthType {
   };
   role: 'store_owner' | 'super_admin';
 }
+
+export interface CurrencyType {
+  uid: string;
+  name: string;
+  code: string;
+  exchange_rate: number;
+}

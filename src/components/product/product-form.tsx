@@ -189,7 +189,7 @@ export default function CreateOrUpdateProductForm({
     watch,
     formState: { errors },
   } = methods;
-  console.log('ffreeeee', errors);
+  // console.log('ffreeeee', errors);
   // const upload_max_filesize = options?.server_info?.upload_max_filesize / 1024;
 
   // const { mutate: createProduct, isLoading: creating } =
@@ -198,7 +198,7 @@ export default function CreateOrUpdateProductForm({
   //   useUpdateProductMutation();
 
   const onSubmit = async (values: ProductFormValues) => {
-    console.log('vals areeeee', values);
+    // console.log('vals areeeee', values);
     // const inputValues = {
     //   language: router.locale,
     //   ...getProductInputValues(values, initialValues, isNewTranslation),
@@ -206,7 +206,7 @@ export default function CreateOrUpdateProductForm({
     try {
       if (!initialValues) {
         if (!values.image) {
-          toast.error('All fields are required');
+          toast.error('Product Image is required');
           return;
         }
 
@@ -237,6 +237,7 @@ export default function CreateOrUpdateProductForm({
     }
   };
 
+  console.log('inittt', initialValues);
   const createShopProduct = useMutation({
     mutationFn: createShopProductFn,
     onSuccess: async () => {
@@ -622,7 +623,10 @@ export default function CreateOrUpdateProductForm({
 						<ProductTypeInput />
 					</div> */}
 
-          <ProductSimpleForm initialValues={initialValues} />
+          <ProductSimpleForm
+            initialValues={initialValues}
+            shopData={shopData}
+          />
 
           {/* Simple Type */}
           {/* {product_type?.value === ProductType.Simple && (

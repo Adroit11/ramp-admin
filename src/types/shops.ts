@@ -1,3 +1,5 @@
+import { CurrencyType } from '.';
+
 export interface GetShopsTypeForOwner {
   id: number;
   uid: string;
@@ -16,6 +18,7 @@ export interface GetShopsTypeForOwner {
 export interface GetShopDetailsTypeForOwner {
   id: number;
   uid: string;
+  currency: CurrencyType;
   owner_id: number;
   no_of_products: number | null;
   no_of_orders: number | null;

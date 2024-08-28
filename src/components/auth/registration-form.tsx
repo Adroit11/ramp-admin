@@ -20,11 +20,14 @@ import { useRegisterMutation } from '@/data/user';
 import { useMutation } from 'react-query';
 import { registerFn } from '@/services/auth';
 import { getErrorMessage } from '@/utils/helpers';
+import Select from '../ui/select/select';
+import { useCurrency } from '@/hooks/useCurrency';
 
 type FormValues = {
   name: string;
   email: string;
   password: string;
+  currency: string;
   permission: Permission;
 };
 const registrationFormSchema = yup.object().shape({
@@ -34,6 +37,7 @@ const registrationFormSchema = yup.object().shape({
     .email('form:error-email-format')
     .required('form:error-email-required'),
   password: yup.string().required('form:error-password-required'),
+  currency: yup.string(),
   permission: yup.string().default('store_owner').oneOf(['store_owner']),
 });
 const RegistrationForm = () => {
@@ -45,6 +49,7 @@ const RegistrationForm = () => {
     handleSubmit,
     formState: { errors },
     setError,
+    setValue,
   } = useForm({
     resolver: yupResolver(registrationFormSchema),
     defaultValues: {
@@ -53,6 +58,8 @@ const RegistrationForm = () => {
   });
   const router = useRouter();
   const { t } = useTranslation();
+
+  const { currencies } = useCurrency();
 
   const handleSignup = useMutation({
     mutationFn: registerFn,
@@ -64,8 +71,15 @@ const RegistrationForm = () => {
     },
   });
 
-  async function onSubmit({ name, email, password, permission }: FormValues) {
-    handleSignup.mutate({ name, email, password });
+  async function onSubmit({
+    name,
+    email,
+    password,
+    permission,
+    currency,
+  }: FormValues) {
+    handleSignup.mutate({ name, email, password, currency });
+    // console.log('curr', currency);
     // registerUser(
     //   {
     //     name,
@@ -131,6 +145,30 @@ const RegistrationForm = () => {
           variant="outline"
           className="mb-4"
         />
+        <div className="mb-6">
+          <label
+            htmlFor={'currency'}
+            className="mb-3 block text-sm font-semibold leading-none text-body-dark"
+          >
+            Select Currency
+            <span className="ml-0.5 text-red-500">*</span>
+          </label>
+          <Select
+            placeholder="Pick a currency"
+            options={
+              currencies && Array.isArray(currencies)
+                ? currencies.map((x, idx) => ({
+                    label: x.name,
+                    value: x.code,
+                  }))
+                : []
+            }
+            onChange={(val: any) => {
+              // console.log(val);
+              setValue('currency', val.value as string);
+            }}
+          />
+        </div>
         <Button
           className="w-full"
           loading={handleSignup.isLoading}

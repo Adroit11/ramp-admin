@@ -8,6 +8,7 @@ export interface CreateShopDataType {
   cover_image: File;
   image: File;
   url?: string;
+  currency?: string;
 }
 export interface EditShopDataType {
   uid: string;
@@ -18,6 +19,7 @@ export interface EditShopDataType {
   cover_image?: File | string;
   image?: File | string;
 
+  currency?: string;
   name?: string;
 }
 
@@ -35,6 +37,9 @@ export const createShopFn = async (data: CreateShopDataType) => {
 
     if (data.url) {
       newData.append('url', data.url);
+    }
+    if (data.currency) {
+      newData.append('currency', data.currency);
     }
 
     const res = await request.post('/shop', newData, {
@@ -63,6 +68,10 @@ export const editShopFn = async (data: EditShopDataType) => {
 
     if (data.url) {
       newData.append('url', data.url);
+    }
+
+    if (data.currency) {
+      newData.append('currency', data.currency);
     }
 
     const res = await request.post('/shop/update', newData, {
